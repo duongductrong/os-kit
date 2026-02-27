@@ -4,5 +4,6 @@ export { InstallationItem } from "./components/installation-item";
 export type {
   InstallTool,
   InstallSection,
+  ToolAction,
   ToolStatus,
 } from "./utils/installation-data";

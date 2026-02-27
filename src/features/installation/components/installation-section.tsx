@@ -6,14 +6,21 @@ import {
   SectionTitle,
 } from "@/components/ui/section";
 import { cn } from "@/lib/utils";
-import type { InstallSection, ToolStatus } from "../utils/installation-data";
+import type {
+  InstallSection,
+  ToolAction,
+  ToolStatus,
+} from "../utils/installation-data";
 import { InstallationItem } from "./installation-item";
 
 interface InstallationSectionProps {
   section: InstallSection;
   statusMap: Record<string, ToolStatus>;
+  versionMap: Record<string, string | null>;
+  actionsMap: Record<string, ToolAction[]>;
   onInstall: (toolId: string) => void;
   onRetry: (toolId: string) => void;
+  onAction: (toolId: string, actionId: string) => void;
   isLocked: boolean;
   isChecking?: boolean;
   showConnector?: boolean;
@@ -22,8 +29,11 @@ interface InstallationSectionProps {
 export function InstallationSection({
   section,
   statusMap,
+  versionMap,
+  actionsMap,
   onInstall,
   onRetry,
+  onAction,
   isLocked,
   isChecking = false,
   showConnector = false,
@@ -61,16 +71,22 @@ export function InstallationSection({
         </SectionHeader>
 
         <SectionContent>
-          {section.tools.map((tool) => (
-            <InstallationItem
-              key={tool.id}
-              tool={tool}
-              status={statusMap[tool.id] ?? "idle"}
-              onInstall={() => onInstall(tool.id)}
-              onRetry={() => onRetry(tool.id)}
-              disabled={isLocked}
-            />
-          ))}
+          {section.tools.map((tool) => {
+            const actions = actionsMap[tool.id] ?? [];
+            return (
+              <InstallationItem
+                key={tool.id}
+                tool={tool}
+                status={statusMap[tool.id] ?? "idle"}
+                version={versionMap[tool.id] ?? null}
+                actions={actions}
+                onInstall={() => onInstall(tool.id)}
+                onRetry={() => onRetry(tool.id)}
+                onAction={(actionId) => onAction(tool.id, actionId)}
+                disabled={isLocked}
+              />
+            );
+          })}
         </SectionContent>
       </Section>
     </div>

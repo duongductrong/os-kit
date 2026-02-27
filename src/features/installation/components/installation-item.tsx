@@ -1,43 +1,212 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   SectionItem,
   SectionItemControl,
   SectionItemLabel,
 } from "@/components/ui/section";
-import type { InstallTool, ToolStatus } from "../utils/installation-data";
+import type {
+  InstallTool,
+  ToolAction,
+  ToolStatus,
+} from "../utils/installation-data";
+import { NvmVersionPanel } from "./nvm-version-panel";
+
+/** Map well-known action IDs to SVG icon paths */
+function ActionIcon({ actionId }: { actionId: string }) {
+  switch (actionId) {
+    case "upgrade":
+      return (
+        <svg
+          className="size-4 mr-2"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="17 11 12 6 7 11" />
+          <line x1="12" y1="18" x2="12" y2="6" />
+        </svg>
+      );
+    case "uninstall":
+      return (
+        <svg
+          className="size-4 mr-2"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      );
+    default:
+      // Generic gear icon for custom actions
+      return (
+        <svg
+          className="size-4 mr-2"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      );
+  }
+}
 
 interface InstallationItemProps {
   tool: InstallTool;
   status: ToolStatus;
+  version: string | null;
+  actions: ToolAction[];
   onInstall: () => void;
   onRetry: () => void;
+  onAction: (actionId: string) => void;
   disabled?: boolean;
 }
 
 export function InstallationItem({
   tool,
   status,
+  version,
+  actions,
   onInstall,
   onRetry,
+  onAction,
   disabled,
 }: InstallationItemProps) {
+  const [expanded, setExpanded] = useState(false);
+  const showSettings = status === "installed" && actions.length > 0;
+
   return (
-    <SectionItem>
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-base">
-          {tool.icon}
-        </span>
-        <SectionItemLabel title={tool.name} description={tool.description} />
-      </div>
-      <SectionItemControl>
-        <StatusAction
-          status={status}
-          onInstall={onInstall}
-          onRetry={onRetry}
-          disabled={disabled}
-        />
-      </SectionItemControl>
-    </SectionItem>
+    <div>
+      <SectionItem className="cursor-default">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-base">
+            {tool.icon}
+          </span>
+          <SectionItemLabel description={tool.description}>
+            <span className="text-sm font-medium leading-snug inline-flex items-center gap-2">
+              {tool.name}
+              {status === "installed" && version && (
+                <span className="font-mono text-xs font-normal text-muted-foreground">
+                  {version}
+                </span>
+              )}
+            </span>
+          </SectionItemLabel>
+        </div>
+        <SectionItemControl>
+          <div className="flex items-center gap-1.5">
+            {/* Expand detail chevron (nvm) */}
+            {tool.hasDetails && status === "installed" && (
+              <Button
+                size="icon-xs"
+                variant="ghost"
+                onClick={() => setExpanded(!expanded)}
+                aria-label={expanded ? "Collapse details" : "Expand details"}
+              >
+                <svg
+                  className={`size-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </Button>
+            )}
+
+            {/* Settings dropdown — driven by YAML actions */}
+            {showSettings && (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      aria-label="Tool settings"
+                    >
+                      <svg
+                        className="size-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="12" cy="5" r="1" />
+                        <circle cx="12" cy="19" r="1" />
+                      </svg>
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent
+                  align="end"
+                  side="bottom"
+                  sideOffset={4}
+                  className="w-[168px]"
+                >
+                  {actions.map((action) => (
+                    <div key={action.id}>
+                      {action.separatorBefore && <DropdownMenuSeparator />}
+                      <DropdownMenuItem
+                        variant={
+                          action.variant === "destructive"
+                            ? "destructive"
+                            : undefined
+                        }
+                        onClick={() => onAction(action.id)}
+                      >
+                        <ActionIcon actionId={action.id} />
+                        {action.label}
+                      </DropdownMenuItem>
+                    </div>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Status badge / action */}
+            <StatusAction
+              status={status}
+              onInstall={onInstall}
+              onRetry={onRetry}
+              disabled={disabled}
+            />
+          </div>
+        </SectionItemControl>
+      </SectionItem>
+
+      {/* Expandable detail panel */}
+      {tool.hasDetails && expanded && status === "installed" && (
+        <div className="border-t border-border bg-muted/30">
+          {tool.id === "nvm" && <NvmVersionPanel />}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -83,7 +252,7 @@ function StatusAction({
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          <span>Installing…</span>
+          <span>Processing…</span>
         </div>
       );
 

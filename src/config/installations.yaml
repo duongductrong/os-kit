@@ -1,0 +1,160 @@
+sections:
+  - id: package-manager
+    title: Package Manager
+    description: Required before installing other tools
+    isPrerequisite: true
+    tools:
+      - id: homebrew
+        name: Homebrew
+        description: The Missing Package Manager for macOS
+        icon: "🍺"
+        checkCommand: "test -x /opt/homebrew/bin/brew || test -x /usr/local/bin/brew"
+        installCommand: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+        versionCommand: "/opt/homebrew/bin/brew --version 2>/dev/null | head -1 || /usr/local/bin/brew --version 2>/dev/null | head -1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew update 2>/dev/null || /usr/local/bin/brew update 2>/dev/null"
+
+  - id: dev-essentials
+    title: Development Essentials
+    description: Core tools for software development
+    tools:
+      - id: git
+        name: Git
+        description: Distributed version control system
+        icon: "🔀"
+        checkCommand: "test -x /opt/homebrew/bin/git || test -x /usr/bin/git || test -x /usr/local/bin/git"
+        installCommand: "/opt/homebrew/bin/brew install git"
+        versionCommand: "/opt/homebrew/bin/git --version 2>/dev/null || /usr/bin/git --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade git"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall git"
+            variant: destructive
+            separatorBefore: true
+
+      - id: nvm
+        name: nvm
+        description: "Node Version Manager — manage multiple Node.js versions"
+        icon: "🟩"
+        checkCommand: "test -d $HOME/.nvm"
+        installCommand: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh)"'
+        versionCommand: ". $HOME/.nvm/nvm.sh && nvm current 2>/dev/null"
+        hasDetails: true
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh)"'
+          - id: uninstall
+            label: Uninstall
+            command: "rm -rf $HOME/.nvm"
+            variant: destructive
+            separatorBefore: true
+
+      - id: python
+        name: Python
+        description: General-purpose programming language
+        icon: "🐍"
+        checkCommand: "test -x /opt/homebrew/bin/python3 || test -x /usr/bin/python3 || test -x /usr/local/bin/python3"
+        installCommand: "/opt/homebrew/bin/brew install python"
+        versionCommand: "/opt/homebrew/bin/python3 --version 2>/dev/null || /usr/bin/python3 --version 2>/dev/null || /usr/local/bin/python3 --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade python"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall python"
+            variant: destructive
+            separatorBefore: true
+
+      - id: go
+        name: Go
+        description: Statically typed, compiled language by Google
+        icon: "🐹"
+        checkCommand: "test -x /opt/homebrew/bin/go || test -x /usr/local/go/bin/go"
+        installCommand: "/opt/homebrew/bin/brew install go"
+        versionCommand: "/opt/homebrew/bin/go version 2>/dev/null || /usr/local/go/bin/go version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade go"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall go"
+            variant: destructive
+            separatorBefore: true
+
+      - id: rust
+        name: Rust
+        description: Fast, memory-safe systems programming language
+        icon: "🦀"
+        checkCommand: "test -d $HOME/.rustup"
+        installCommand: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
+        versionCommand: "$HOME/.cargo/bin/rustc --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "$HOME/.cargo/bin/rustup update"
+          - id: uninstall
+            label: Uninstall
+            command: "$HOME/.cargo/bin/rustup self uninstall -y"
+            variant: destructive
+            separatorBefore: true
+
+  - id: terminal-shell
+    title: "Terminal & Shell"
+    description: Enhance your terminal experience
+    tools:
+      - id: iterm2
+        name: iTerm2
+        description: Feature-rich terminal emulator for macOS
+        icon: "🖥️"
+        checkCommand: 'test -d "/Applications/iTerm.app" || test -d "$HOME/Applications/iTerm.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask iterm2"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask iterm2"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask iterm2"
+            variant: destructive
+            separatorBefore: true
+
+      - id: ohmyzsh
+        name: Oh My Zsh
+        description: Framework for managing Zsh configuration
+        icon: "⚡"
+        checkCommand: "test -d $HOME/.oh-my-zsh"
+        installCommand: 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "$HOME/.oh-my-zsh/tools/upgrade.sh"
+          - id: uninstall
+            label: Uninstall
+            command: "rm -rf $HOME/.oh-my-zsh"
+            variant: destructive
+            separatorBefore: true
+
+      - id: starship
+        name: Starship
+        description: "Minimal, fast, and customizable shell prompt"
+        icon: "🚀"
+        checkCommand: "test -x /opt/homebrew/bin/starship || test -x /usr/local/bin/starship"
+        installCommand: "/opt/homebrew/bin/brew install starship"
+        versionCommand: "/opt/homebrew/bin/starship --version 2>/dev/null | head -1 || /usr/local/bin/starship --version 2>/dev/null | head -1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade starship"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall starship"
+            variant: destructive
+            separatorBefore: true

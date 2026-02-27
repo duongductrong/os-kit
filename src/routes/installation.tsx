@@ -12,7 +12,10 @@ export default function Installation() {
   const {
     sections,
     statusMap,
+    versionMap,
+    actionsMap,
     installTool,
+    executeAction,
     retryTool,
     isPrerequisiteMet,
     isCheckingPrerequisite,
@@ -47,8 +50,11 @@ export default function Installation() {
               key={section.id}
               section={section}
               statusMap={statusMap}
+              versionMap={versionMap}
+              actionsMap={actionsMap}
               onInstall={installTool}
               onRetry={retryTool}
+              onAction={executeAction}
               isLocked={isLocked}
               isChecking={section.isPrerequisite && isCheckingPrerequisite}
               showConnector={index > 0}
