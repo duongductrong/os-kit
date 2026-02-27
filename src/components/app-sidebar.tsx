@@ -19,14 +19,13 @@ import {
   RoboticIcon,
   SentIcon,
   Setting07Icon,
-  Settings05Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 const data = {
   navMain: [
     {
-      title: "Apps",
+      title: "Developer Apps",
       url: "#",
       icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
       isActive: true,
