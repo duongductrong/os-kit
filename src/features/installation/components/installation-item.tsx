@@ -21,6 +21,11 @@ import type {
 import type { ToolLogState } from "@/hooks/use-tool-logs";
 import { NvmVersionPanel } from "./nvm-version-panel";
 import { TerminalLog } from "./terminal-log";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 /** Map well-known action IDs to SVG icon paths */
 function ActionIcon({ actionId }: { actionId: string }) {
@@ -122,9 +127,20 @@ export function InstallationItem({
               {status === "installed" &&
                 managedBy === "manual" &&
                 tool.brewCaskName && (
-                  <span className="inline-flex items-center rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
-                    Manual
-                  </span>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <span className="inline-flex items-center rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400 cursor-help">
+                          Manual
+                        </span>
+                      }
+                    />
+                    <TooltipContent side="top">
+                      Installed outside of Homebrew (e.g. via DMG).
+                      <br />
+                      Some actions like upgrade may not be available.
+                    </TooltipContent>
+                  </Tooltip>
                 )}
             </span>
           </SectionItemLabel>
