@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useZshrcEditor } from "@/features/shell/hooks/use-zshrc-editor";
+import { ZshrcVisualEditor } from "@/features/shell/components/visual-editor/zshrc-visual-editor";
 import {
   Alert02Icon,
+  CodeIcon,
+  DashboardSquare01Icon,
   FileEditIcon,
   FloppyDiskIcon,
   Loading03Icon,
@@ -10,7 +14,10 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
+type EditorMode = "visual" | "raw";
+
 export function ZshrcEditor() {
+  const [mode, setMode] = useState<EditorMode>("visual");
   const {
     content,
     isLoading,
@@ -83,6 +90,40 @@ export function ZshrcEditor() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Mode Toggle */}
+          <div className="flex items-center rounded-lg border p-0.5">
+            <button
+              onClick={() => setMode("visual")}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                mode === "visual"
+                  ? "bg-muted text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <HugeiconsIcon
+                icon={DashboardSquare01Icon}
+                strokeWidth={2}
+                className="size-3"
+              />
+              Visual
+            </button>
+            <button
+              onClick={() => setMode("raw")}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                mode === "raw"
+                  ? "bg-muted text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <HugeiconsIcon
+                icon={CodeIcon}
+                strokeWidth={2}
+                className="size-3"
+              />
+              Raw
+            </button>
+          </div>
+
           <Button
             variant="outline"
             size="sm"
@@ -115,29 +156,33 @@ export function ZshrcEditor() {
         </div>
       </div>
 
-      {/* Code Editor */}
-      <div className="relative rounded-lg border overflow-hidden">
-        <div className="flex max-h-[60vh]">
-          {/* Line Numbers */}
-          <div
-            className="select-none border-r bg-muted/30 px-3 py-3 text-right font-mono text-xs text-muted-foreground/50 leading-[1.625rem]"
-            aria-hidden="true"
-          >
-            {content.split("\n").map((_, i) => (
-              <div key={i}>{i + 1}</div>
-            ))}
-          </div>
+      {/* Editor Content */}
+      {mode === "visual" ? (
+        <ZshrcVisualEditor content={content} onChange={setContent} />
+      ) : (
+        <div className="relative rounded-lg border overflow-hidden">
+          <div className="flex max-h-[60vh]">
+            {/* Line Numbers */}
+            <div
+              className="select-none border-r bg-muted/30 px-3 py-3 text-right font-mono text-xs text-muted-foreground/50 leading-[1.625rem]"
+              aria-hidden="true"
+            >
+              {content.split("\n").map((_, i) => (
+                <div key={i}>{i + 1}</div>
+              ))}
+            </div>
 
-          {/* Textarea */}
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            spellCheck={false}
-            className="flex-1 resize-none bg-transparent px-4 py-3 font-mono text-sm leading-[1.625rem] outline-none placeholder:text-muted-foreground/40 min-h-[400px] w-full"
-            placeholder="# Your zshrc configuration..."
-          />
+            {/* Textarea */}
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              spellCheck={false}
+              className="flex-1 resize-none bg-transparent px-4 py-3 font-mono text-sm leading-[1.625rem] outline-none placeholder:text-muted-foreground/40 min-h-[400px] w-full"
+              placeholder="# Your zshrc configuration..."
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Status Bar */}
       <div className="flex items-center justify-between text-xs text-muted-foreground">
