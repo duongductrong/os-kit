@@ -25,7 +25,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 const data = {
   navMain: [
     {
-      title: "Setup",
+      title: "Mac",
       url: "#",
       icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
       isActive: true,
@@ -33,6 +33,10 @@ const data = {
         {
           title: "Installation",
           url: "/installation",
+        },
+        {
+          title: "Shell",
+          url: "/shell",
         },
       ],
     },

@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShellRouteImport } from './routes/shell'
 import { Route as InstallationRouteImport } from './routes/installation'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ShellRoute = ShellRouteImport.update({
+  id: '/shell',
+  path: '/shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstallationRoute = InstallationRouteImport.update({
   id: '/installation',
   path: '/installation',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/installation': typeof InstallationRoute
+  '/shell': typeof ShellRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/installation': typeof InstallationRoute
+  '/shell': typeof ShellRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/installation': typeof InstallationRoute
+  '/shell': typeof ShellRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/installation'
+  fullPaths: '/' | '/installation' | '/shell'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/installation'
-  id: '__root__' | '/' | '/installation'
+  to: '/' | '/installation' | '/shell'
+  id: '__root__' | '/' | '/installation' | '/shell'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   InstallationRoute: typeof InstallationRoute
+  ShellRoute: typeof ShellRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shell': {
+      id: '/shell'
+      path: '/shell'
+      fullPath: '/shell'
+      preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/installation': {
       id: '/installation'
       path: '/installation'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   InstallationRoute: InstallationRoute,
+  ShellRoute: ShellRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
