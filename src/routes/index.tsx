@@ -13,8 +13,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { createFileRoute } from "@tanstack/react-router";
 
-export default function App() {
+export const Route = createFileRoute("/")({
+  component: Index,
+});
+
+function Index() {
   return (
     <SidebarProvider>
       <AppSidebar />
