@@ -10,6 +10,7 @@ import type {
   InstallSection,
   ToolAction,
   ToolStatus,
+  ManagedBy,
 } from "../utils/installation-data";
 import type { ToolLogState } from "@/hooks/use-tool-logs";
 import { InstallationItem } from "./installation-item";
@@ -18,6 +19,7 @@ interface InstallationSectionProps {
   section: InstallSection;
   statusMap: Record<string, ToolStatus>;
   versionMap: Record<string, string | null>;
+  managedByMap: Record<string, ManagedBy>;
   actionsMap: Record<string, ToolAction[]>;
   logsMap: Record<string, ToolLogState>;
   onInstall: (toolId: string) => void;
@@ -33,6 +35,7 @@ export function InstallationSection({
   section,
   statusMap,
   versionMap,
+  managedByMap,
   actionsMap,
   logsMap,
   onInstall,
@@ -84,6 +87,7 @@ export function InstallationSection({
                 tool={tool}
                 status={statusMap[tool.id] ?? "idle"}
                 version={versionMap[tool.id] ?? null}
+                managedBy={managedByMap[tool.id] ?? "manual"}
                 actions={actions}
                 logState={logsMap[tool.id]}
                 onInstall={() => onInstall(tool.id)}

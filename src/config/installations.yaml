@@ -101,14 +101,17 @@ sections:
         icon: "🦋"
         checkCommand: "test -x /opt/homebrew/bin/flutter || test -d $HOME/flutter"
         installCommand: "/opt/homebrew/bin/brew install --cask flutter"
+        brewCaskName: flutter
         versionCommand: "/opt/homebrew/bin/flutter --version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask flutter"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask flutter"
+            fallbackCommand: "rm -rf $HOME/flutter"
             variant: destructive
             separatorBefore: true
 
@@ -159,13 +162,16 @@ sections:
         icon: "🌳"
         checkCommand: 'test -d "/Applications/Sourcetree.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask sourcetree"
+        brewCaskName: sourcetree
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask sourcetree"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask sourcetree"
+            fallbackCommand: 'rm -rf "/Applications/Sourcetree.app"'
             variant: destructive
             separatorBefore: true
 
@@ -182,14 +188,17 @@ sections:
         icon: "💠"
         checkCommand: 'test -d "/Applications/Visual Studio Code.app" || test -x /usr/local/bin/code'
         installCommand: "/opt/homebrew/bin/brew install --cask visual-studio-code"
+        brewCaskName: visual-studio-code
         versionCommand: "/usr/local/bin/code --version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask visual-studio-code"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask visual-studio-code"
+            fallbackCommand: 'rm -rf "/Applications/Visual Studio Code.app"'
             variant: destructive
             separatorBefore: true
 
@@ -199,13 +208,16 @@ sections:
         icon: "⚡"
         checkCommand: 'test -d "/Applications/Cursor.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask cursor"
+        brewCaskName: cursor
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask cursor"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask cursor"
+            fallbackCommand: 'rm -rf "/Applications/Cursor.app"'
             variant: destructive
             separatorBefore: true
 
@@ -215,13 +227,16 @@ sections:
         icon: "🧲"
         checkCommand: 'test -d "/Applications/Antigravity.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask google-antigravity"
+        brewCaskName: google-antigravity
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask google-antigravity"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask google-antigravity"
+            fallbackCommand: 'rm -rf "/Applications/Antigravity.app"'
             variant: destructive
             separatorBefore: true
 
@@ -231,13 +246,16 @@ sections:
         icon: "📱"
         checkCommand: 'test -d "/Applications/Android Studio.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask android-studio"
+        brewCaskName: android-studio
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask android-studio"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask android-studio"
+            fallbackCommand: 'rm -rf "/Applications/Android Studio.app"'
             variant: destructive
             separatorBefore: true
 
@@ -254,13 +272,16 @@ sections:
         icon: "🖥️"
         checkCommand: 'test -d "/Applications/iTerm.app" || test -d "$HOME/Applications/iTerm.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask iterm2"
+        brewCaskName: iterm2
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask iterm2"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask iterm2"
+            fallbackCommand: 'rm -rf "/Applications/iTerm.app"'
             variant: destructive
             separatorBefore: true
 
@@ -270,13 +291,16 @@ sections:
         icon: "🌀"
         checkCommand: 'test -d "/Applications/Warp.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask warp"
+        brewCaskName: warp
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask warp"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask warp"
+            fallbackCommand: 'rm -rf "/Applications/Warp.app"'
             variant: destructive
             separatorBefore: true
 
@@ -286,13 +310,16 @@ sections:
         icon: "👻"
         checkCommand: 'test -d "/Applications/Ghostty.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask ghostty"
+        brewCaskName: ghostty
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask ghostty"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask ghostty"
+            fallbackCommand: 'rm -rf "/Applications/Ghostty.app"'
             variant: destructive
             separatorBefore: true
 
@@ -342,14 +369,17 @@ sections:
         icon: "🐳"
         checkCommand: "test -x /usr/local/bin/docker || test -x /opt/homebrew/bin/docker"
         installCommand: "/opt/homebrew/bin/brew install --cask docker"
+        brewCaskName: docker
         versionCommand: "/usr/local/bin/docker --version 2>/dev/null || /opt/homebrew/bin/docker --version 2>/dev/null"
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask docker"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask docker"
+            fallbackCommand: 'rm -rf "/Applications/Docker.app"'
             variant: destructive
             separatorBefore: true
 
@@ -359,14 +389,17 @@ sections:
         icon: "🪐"
         checkCommand: 'test -d "/Applications/OrbStack.app" || test -x /usr/local/bin/orbctl'
         installCommand: "/opt/homebrew/bin/brew install --cask orbstack"
+        brewCaskName: orbstack
         versionCommand: "/usr/local/bin/orbctl version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask orbstack"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask orbstack"
+            fallbackCommand: 'rm -rf "/Applications/OrbStack.app"'
             variant: destructive
             separatorBefore: true
 
@@ -451,13 +484,16 @@ sections:
         icon: "🧭"
         checkCommand: 'test -d "/Applications/MongoDB Compass.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask mongodb-compass"
+        brewCaskName: mongodb-compass
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask mongodb-compass"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask mongodb-compass"
+            fallbackCommand: 'rm -rf "/Applications/MongoDB Compass.app"'
             variant: destructive
             separatorBefore: true
 
@@ -467,13 +503,16 @@ sections:
         icon: "🗄️"
         checkCommand: 'test -d "/Applications/Studio 3T.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask studio-3t"
+        brewCaskName: studio-3t
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask studio-3t"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask studio-3t"
+            fallbackCommand: 'rm -rf "/Applications/Studio 3T.app"'
             variant: destructive
             separatorBefore: true
 
@@ -507,14 +546,17 @@ sections:
         icon: "🌩️"
         checkCommand: "test -x /opt/homebrew/bin/gcloud || test -x /usr/local/bin/gcloud"
         installCommand: "/opt/homebrew/bin/brew install --cask google-cloud-sdk"
+        brewCaskName: google-cloud-sdk
         versionCommand: "gcloud --version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask google-cloud-sdk"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask google-cloud-sdk"
+            fallbackCommand: ""
             variant: destructive
             separatorBefore: true
 
@@ -565,13 +607,16 @@ sections:
         icon: "💬"
         checkCommand: 'test -d "/Applications/ChatGPT.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask chatgpt"
+        brewCaskName: chatgpt
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask chatgpt"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask chatgpt"
+            fallbackCommand: 'rm -rf "/Applications/ChatGPT.app"'
             variant: destructive
             separatorBefore: true
 
@@ -581,13 +626,16 @@ sections:
         icon: "🤖"
         checkCommand: 'test -d "/Applications/Claude.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask claude"
+        brewCaskName: claude
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask claude"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask claude"
+            fallbackCommand: 'rm -rf "/Applications/Claude.app"'
             variant: destructive
             separatorBefore: true
 
@@ -597,13 +645,16 @@ sections:
         icon: "🧬"
         checkCommand: 'test -d "/Applications/Codex.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask codex"
+        brewCaskName: codex
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask codex"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask codex"
+            fallbackCommand: 'rm -rf "/Applications/Codex.app"'
             variant: destructive
             separatorBefore: true
 
@@ -637,13 +688,16 @@ sections:
         icon: "🔵"
         checkCommand: 'test -d "/Applications/Google Chrome.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask google-chrome"
+        brewCaskName: google-chrome
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask google-chrome"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask google-chrome"
+            fallbackCommand: 'rm -rf "/Applications/Google Chrome.app"'
             variant: destructive
             separatorBefore: true
 
@@ -653,13 +707,16 @@ sections:
         icon: "🦊"
         checkCommand: 'test -d "/Applications/Firefox.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask firefox"
+        brewCaskName: firefox
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask firefox"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask firefox"
+            fallbackCommand: 'rm -rf "/Applications/Firefox.app"'
             variant: destructive
             separatorBefore: true
 
@@ -676,13 +733,16 @@ sections:
         icon: "💼"
         checkCommand: 'test -d "/Applications/Slack.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask slack"
+        brewCaskName: slack
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask slack"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask slack"
+            fallbackCommand: 'rm -rf "/Applications/Slack.app"'
             variant: destructive
             separatorBefore: true
 
@@ -692,13 +752,16 @@ sections:
         icon: "🎮"
         checkCommand: 'test -d "/Applications/Discord.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask discord"
+        brewCaskName: discord
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask discord"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask discord"
+            fallbackCommand: 'rm -rf "/Applications/Discord.app"'
             variant: destructive
             separatorBefore: true
 
@@ -708,13 +771,16 @@ sections:
         icon: "✈️"
         checkCommand: 'test -d "/Applications/Telegram.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask telegram"
+        brewCaskName: telegram
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask telegram"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask telegram"
+            fallbackCommand: 'rm -rf "/Applications/Telegram.app"'
             variant: destructive
             separatorBefore: true
 
@@ -731,13 +797,16 @@ sections:
         icon: "🔦"
         checkCommand: 'test -d "/Applications/Raycast.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask raycast"
+        brewCaskName: raycast
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask raycast"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask raycast"
+            fallbackCommand: 'rm -rf "/Applications/Raycast.app"'
             variant: destructive
             separatorBefore: true
 
@@ -747,13 +816,16 @@ sections:
         icon: "📝"
         checkCommand: 'test -d "/Applications/Notion.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask notion"
+        brewCaskName: notion
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask notion"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask notion"
+            fallbackCommand: 'rm -rf "/Applications/Notion.app"'
             variant: destructive
             separatorBefore: true
 
@@ -763,12 +835,15 @@ sections:
         icon: "🖥️"
         checkCommand: 'test -d "/Applications/AnyDesk.app"'
         installCommand: "/opt/homebrew/bin/brew install --cask anydesk"
+        brewCaskName: anydesk
         actions:
           - id: upgrade
             label: Upgrade version
             command: "/opt/homebrew/bin/brew upgrade --cask anydesk"
+            fallbackCommand: ""
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask anydesk"
+            fallbackCommand: 'rm -rf "/Applications/AnyDesk.app"'
             variant: destructive
             separatorBefore: true

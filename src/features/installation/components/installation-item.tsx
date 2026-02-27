@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/section";
 import type {
   InstallTool,
+  ManagedBy,
   ToolAction,
   ToolStatus,
 } from "../utils/installation-data";
@@ -77,6 +78,7 @@ interface InstallationItemProps {
   tool: InstallTool;
   status: ToolStatus;
   version: string | null;
+  managedBy: ManagedBy;
   actions: ToolAction[];
   logState?: ToolLogState;
   onInstall: () => void;
@@ -90,6 +92,7 @@ export function InstallationItem({
   tool,
   status,
   version,
+  managedBy,
   actions,
   logState,
   onInstall,
@@ -116,6 +119,13 @@ export function InstallationItem({
                   {version}
                 </span>
               )}
+              {status === "installed" &&
+                managedBy === "manual" &&
+                tool.brewCaskName && (
+                  <span className="inline-flex items-center rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                    Manual
+                  </span>
+                )}
             </span>
           </SectionItemLabel>
         </div>

@@ -1,6 +1,7 @@
 import { Command } from "@tauri-apps/plugin-shell";
 import { useCallback, useEffect, useState } from "react";
 import type { ToolStatus } from "@/lib/types";
+import type { ManagedBy } from "@/features/installation/utils/installation-data";
 
 export interface ToolDetectionConfig {
   /** Unique tool identifier */
@@ -15,6 +16,8 @@ export interface ToolDetectionConfig {
   uninstallCommand?: string;
   /** Shell command to get the version string (stdout is captured and trimmed) */
   versionCommand?: string;
+  /** Homebrew cask name — if set, detection will check if brew manages this app */
+  brewCaskName?: string;
 }
 
 /** Callbacks for streaming shell output */
@@ -30,6 +33,7 @@ export interface ToolDetectionResult {
   status: ToolStatus;
   checking: boolean;
   version: string | null;
+  managedBy: ManagedBy;
   install: (stream?: StreamCallbacks) => Promise<void>;
   upgrade: (stream?: StreamCallbacks) => Promise<void>;
   uninstall: (stream?: StreamCallbacks) => Promise<void>;
@@ -44,7 +48,7 @@ async function execSh(command: string) {
 }
 
 /** Spawn a shell command with streaming stdout/stderr callbacks. Returns exit code. */
-async function spawnSh(
+export async function spawnSh(
   command: string,
   callbacks?: StreamCallbacks,
 ): Promise<number> {
@@ -85,9 +89,22 @@ async function fetchVersion(versionCommand: string): Promise<string | null> {
   return null;
 }
 
+/** Check if a cask is managed by Homebrew */
+async function checkBrewManaged(caskName: string): Promise<boolean> {
+  try {
+    const result = await execSh(
+      `/opt/homebrew/bin/brew list --cask 2>/dev/null | grep -q "^${caskName}$"`,
+    );
+    return result.code === 0;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Generic hook to detect, get version, install, upgrade, and uninstall a CLI tool.
  * Install/upgrade/uninstall now support streaming output via optional StreamCallbacks.
+ * When brewCaskName is set, also detects whether the app is brew-managed or manually installed.
  */
 export function useToolDetection(
   config: ToolDetectionConfig,
@@ -95,6 +112,7 @@ export function useToolDetection(
   const [status, setStatus] = useState<ToolStatus>("idle");
   const [checking, setChecking] = useState(true);
   const [version, setVersion] = useState<string | null>(null);
+  const [managedBy, setManagedBy] = useState<ManagedBy>("manual");
 
   const check = useCallback(async () => {
     setChecking(true);
@@ -105,18 +123,34 @@ export function useToolDetection(
         if (config.versionCommand) {
           setVersion(await fetchVersion(config.versionCommand));
         }
+        // Detect brew management for cask apps
+        if (config.brewCaskName) {
+          const isBrew = await checkBrewManaged(config.brewCaskName);
+          setManagedBy(isBrew ? "brew" : "manual");
+        } else {
+          // Non-cask tools (CLI tools installed via brew formula, nvm, rustup, etc.)
+          // default to "manual" which will use primary commands anyway (no fallbacks defined)
+          setManagedBy("manual");
+        }
       } else {
         setStatus("idle");
         setVersion(null);
+        setManagedBy("manual");
       }
     } catch (error) {
       console.log(`useToolDetection(${config.id}):`, error);
       setStatus("idle");
       setVersion(null);
+      setManagedBy("manual");
     } finally {
       setChecking(false);
     }
-  }, [config.checkCommand, config.id, config.versionCommand]);
+  }, [
+    config.checkCommand,
+    config.id,
+    config.versionCommand,
+    config.brewCaskName,
+  ]);
 
   const install = useCallback(
     async (stream?: StreamCallbacks) => {
@@ -200,6 +234,7 @@ export function useToolDetection(
     status,
     checking,
     version,
+    managedBy,
     install,
     upgrade,
     uninstall,
@@ -230,6 +265,7 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
     (stream?: StreamCallbacks) => Promise<void>
   > = {};
   const versionMap: Record<string, string | null> = {};
+  const managedByMap: Record<string, ManagedBy> = {};
   const capabilityMap: Record<
     string,
     { hasUpgrade: boolean; hasUninstall: boolean }
@@ -242,6 +278,7 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
     upgradeMap[r.id] = r.upgrade;
     uninstallMap[r.id] = r.uninstall;
     versionMap[r.id] = r.version;
+    managedByMap[r.id] = r.managedBy;
     capabilityMap[r.id] = {
       hasUpgrade: r.hasUpgrade,
       hasUninstall: r.hasUninstall,
@@ -257,6 +294,7 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
     upgradeMap,
     uninstallMap,
     versionMap,
+    managedByMap,
     capabilityMap,
     isAnyChecking,
     results,

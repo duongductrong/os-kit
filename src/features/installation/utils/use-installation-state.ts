@@ -2,12 +2,14 @@ import { useCallback, useMemo } from "react";
 import {
   getAllTools,
   getToolAction,
+  getEffectiveActionCommand,
   loadInstallationSections,
 } from "./installation-data";
-import type { ToolAction } from "./installation-data";
+import type { ToolAction, ManagedBy } from "./installation-data";
 import type { ToolStatus } from "@/lib/types";
 import {
   useMultiToolDetection,
+  spawnSh,
   type StreamCallbacks,
   type ToolDetectionConfig,
 } from "@/hooks/use-tool-detection";
@@ -32,6 +34,7 @@ export function useInstallationState() {
         upgradeCommand: getToolAction(t, "upgrade")?.command,
         uninstallCommand: getToolAction(t, "uninstall")?.command,
         versionCommand: t.versionCommand,
+        brewCaskName: t.brewCaskName,
       }));
   }, [sections]);
 
@@ -46,14 +49,34 @@ export function useInstallationState() {
     return map;
   }, [sections, detection.statusMap]);
 
-  // Build actions map: toolId → ToolAction[]
-  const actionsMap: Record<string, ToolAction[]> = useMemo(() => {
-    const map: Record<string, ToolAction[]> = {};
+  // Build managedBy map
+  const managedByMap: Record<string, ManagedBy> = useMemo(() => {
+    const map: Record<string, ManagedBy> = {};
     for (const tool of getAllTools(sections)) {
-      map[tool.id] = tool.actions ?? [];
+      map[tool.id] = detection.managedByMap[tool.id] ?? "manual";
     }
     return map;
-  }, [sections]);
+  }, [sections, detection.managedByMap]);
+
+  // Build effective actions map: filters out actions that have no usable command
+  // for the current install source, and resolves fallback commands
+  const effectiveActionsMap: Record<string, ToolAction[]> = useMemo(() => {
+    const map: Record<string, ToolAction[]> = {};
+    for (const tool of getAllTools(sections)) {
+      const managed = managedByMap[tool.id] ?? "manual";
+      const filtered: ToolAction[] = [];
+      for (const action of tool.actions ?? []) {
+        const effectiveCmd = getEffectiveActionCommand(action, managed);
+        if (effectiveCmd) {
+          // Replace the command with the effective one (may be fallback)
+          filtered.push({ ...action, command: effectiveCmd });
+        }
+        // If effectiveCmd is undefined, action is hidden
+      }
+      map[tool.id] = filtered;
+    }
+    return map;
+  }, [sections, managedByMap]);
 
   /** Create StreamCallbacks that pipe output into the log store */
   const makeStreamCallbacks = useCallback(
@@ -87,18 +110,50 @@ export function useInstallationState() {
   );
 
   const executeAction = useCallback(
-    (toolId: string, actionId: string) => {
-      const stream = makeStreamCallbacks(toolId);
-      if (actionId === "upgrade") {
-        const upgrader = detection.upgradeMap[toolId];
-        if (upgrader) upgrader(stream);
-      } else if (actionId === "uninstall") {
-        const uninstaller = detection.uninstallMap[toolId];
-        if (uninstaller) uninstaller(stream);
+    async (toolId: string, actionId: string) => {
+      // Look up the effective action (already resolved for brew vs manual)
+      const effectiveAction = effectiveActionsMap[toolId]?.find(
+        (a) => a.id === actionId,
+      );
+      if (!effectiveAction?.command) return;
+
+      // Check if the effective command differs from the primary command
+      // (i.e., we're using a fallback command for a manually-installed app)
+      const primaryAction = getAllTools(sections)
+        .find((t) => t.id === toolId)
+        ?.actions?.find((a) => a.id === actionId);
+      const isPrimaryCommand =
+        effectiveAction.command === primaryAction?.command;
+
+      if (isPrimaryCommand) {
+        // Use the detection hook's built-in methods (they handle status transitions)
+        const stream = makeStreamCallbacks(toolId);
+        if (actionId === "upgrade") {
+          const upgrader = detection.upgradeMap[toolId];
+          if (upgrader) upgrader(stream);
+        } else if (actionId === "uninstall") {
+          const uninstaller = detection.uninstallMap[toolId];
+          if (uninstaller) uninstaller(stream);
+        }
+      } else {
+        // Using a fallback command — spawn directly
+        const stream = makeStreamCallbacks(toolId);
+        try {
+          const exitCode = await spawnSh(effectiveAction.command, stream);
+          stream.onEnd?.(exitCode);
+        } catch (err) {
+          console.error(`Action ${actionId} for ${toolId} error:`, err);
+          stream.onEnd?.(-1);
+        }
       }
-      // Future: handle custom action IDs via a generic exec mechanism
     },
-    [detection.upgradeMap, detection.uninstallMap, makeStreamCallbacks],
+    [
+      detection.upgradeMap,
+      detection.uninstallMap,
+      effectiveActionsMap,
+      sections,
+      makeStreamCallbacks,
+    ],
   );
 
   const retryTool = useCallback(
@@ -133,7 +188,8 @@ export function useInstallationState() {
     sections,
     statusMap,
     versionMap: detection.versionMap,
-    actionsMap,
+    managedByMap,
+    actionsMap: effectiveActionsMap,
     logsMap,
     installTool,
     executeAction,

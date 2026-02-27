@@ -10,6 +10,8 @@ export interface ToolAction {
   label: string;
   /** Shell command to execute for this action */
   command: string;
+  /** Fallback command when app is not brew-managed (empty string = hide action) */
+  fallbackCommand?: string;
   /** Optional variant for styling (e.g. "destructive" for red) */
   variant?: string;
   /** If true, render a separator line above this action */
@@ -29,6 +31,8 @@ export interface InstallTool {
   versionCommand?: string;
   /** Whether this tool has an expandable detail panel */
   hasDetails?: boolean;
+  /** Homebrew cask name — enables brew-management detection at runtime */
+  brewCaskName?: string;
   /** Configurable actions shown in the tool's dropdown menu */
   actions?: ToolAction[];
 }
@@ -56,10 +60,33 @@ export function getAllTools(sections: InstallSection[]): InstallTool[] {
   return sections.flatMap((s) => s.tools);
 }
 
+/** How a tool was installed */
+export type ManagedBy = "brew" | "manual";
+
 /** Look up a specific action by ID on a tool */
 export function getToolAction(
   tool: InstallTool,
   actionId: string,
 ): ToolAction | undefined {
   return tool.actions?.find((a) => a.id === actionId);
+}
+
+/**
+ * Get the effective command for an action based on how the tool is managed.
+ * Returns undefined if the action should be hidden (fallbackCommand is empty string).
+ */
+export function getEffectiveActionCommand(
+  action: ToolAction,
+  managedBy: ManagedBy,
+): string | undefined {
+  if (managedBy === "brew") {
+    return action.command;
+  }
+  // Not brew-managed: use fallback if provided
+  if (action.fallbackCommand !== undefined) {
+    // Empty string means "hide this action"
+    return action.fallbackCommand || undefined;
+  }
+  // No fallback defined: use the primary command (for non-brew tools like nvm, rust, etc.)
+  return action.command;
 }
