@@ -106,6 +106,108 @@ sections:
             variant: destructive
             separatorBefore: true
 
+      - id: docker
+        name: Docker
+        description: Container platform for building and running apps
+        icon: "🐳"
+        checkCommand: "test -x /usr/local/bin/docker || test -x /opt/homebrew/bin/docker"
+        installCommand: "/opt/homebrew/bin/brew install --cask docker"
+        versionCommand: "/usr/local/bin/docker --version 2>/dev/null || /opt/homebrew/bin/docker --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask docker"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask docker"
+            variant: destructive
+            separatorBefore: true
+
+      - id: orbstack
+        name: OrbStack
+        description: "Fast, lightweight Docker & Linux on macOS"
+        icon: "🪐"
+        checkCommand: 'test -d "/Applications/OrbStack.app" || test -x /usr/local/bin/orbctl'
+        installCommand: "/opt/homebrew/bin/brew install --cask orbstack"
+        versionCommand: "/usr/local/bin/orbctl version 2>/dev/null | head -1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask orbstack"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask orbstack"
+            variant: destructive
+            separatorBefore: true
+
+      - id: mysql
+        name: MySQL
+        description: Popular open-source relational database
+        icon: "🐬"
+        checkCommand: "test -x /opt/homebrew/bin/mysql || test -x /usr/local/bin/mysql"
+        installCommand: "/opt/homebrew/bin/brew install mysql"
+        versionCommand: "/opt/homebrew/bin/mysql --version 2>/dev/null || /usr/local/bin/mysql --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade mysql"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall mysql"
+            variant: destructive
+            separatorBefore: true
+
+      - id: postgresql
+        name: PostgreSQL
+        description: Advanced open-source relational database
+        icon: "🐘"
+        checkCommand: "test -x /opt/homebrew/bin/psql || test -x /usr/local/bin/psql"
+        installCommand: "/opt/homebrew/bin/brew install postgresql@16"
+        versionCommand: "/opt/homebrew/bin/psql --version 2>/dev/null || /usr/local/bin/psql --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade postgresql@16"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall postgresql@16"
+            variant: destructive
+            separatorBefore: true
+
+      - id: redis
+        name: Redis
+        description: In-memory data store for caching and messaging
+        icon: "🔴"
+        checkCommand: "test -x /opt/homebrew/bin/redis-server || test -x /usr/local/bin/redis-server"
+        installCommand: "/opt/homebrew/bin/brew install redis"
+        versionCommand: "/opt/homebrew/bin/redis-server --version 2>/dev/null || /usr/local/bin/redis-server --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade redis"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall redis"
+            variant: destructive
+            separatorBefore: true
+
+      - id: nginx
+        name: nginx
+        description: High-performance HTTP server and reverse proxy
+        icon: "🌐"
+        checkCommand: "test -x /opt/homebrew/bin/nginx || test -x /usr/local/bin/nginx"
+        installCommand: "/opt/homebrew/bin/brew install nginx"
+        versionCommand: "/opt/homebrew/bin/nginx -v 2>&1 || /usr/local/bin/nginx -v 2>&1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade nginx"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall nginx"
+            variant: destructive
+            separatorBefore: true
+
   - id: terminal-shell
     title: "Terminal & Shell"
     description: Enhance your terminal experience
