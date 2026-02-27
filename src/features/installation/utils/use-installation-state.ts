@@ -1,42 +1,42 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { getAllTools, installationSections } from "./installation-data";
 import type { ToolStatus } from "@/lib/types";
-import { useHomebrew } from "@/hooks/use-homebrew";
-
-type ToolStatusMap = Record<string, ToolStatus>;
+import {
+  useMultiToolDetection,
+  type ToolDetectionConfig,
+} from "@/hooks/use-tool-detection";
 
 export function useInstallationState() {
-  const homebrew = useHomebrew();
+  // Build detection configs from all tools that have a checkCommand
+  const detectionConfigs: ToolDetectionConfig[] = useMemo(() => {
+    return getAllTools(installationSections)
+      .filter((t) => t.checkCommand)
+      .map((t) => ({
+        id: t.id,
+        checkCommand: t.checkCommand!,
+        installCommand: t.installCommand,
+      }));
+  }, []);
 
-  const [statusMap, setStatusMap] = useState<ToolStatusMap>(() => {
-    const map: ToolStatusMap = {};
+  const detection = useMultiToolDetection(detectionConfigs);
+
+  // Build a complete status map (tools without checkCommand stay "idle")
+  const statusMap: Record<string, ToolStatus> = useMemo(() => {
+    const map: Record<string, ToolStatus> = {};
     for (const tool of getAllTools(installationSections)) {
-      map[tool.id] = "idle";
+      map[tool.id] = detection.statusMap[tool.id] ?? "idle";
     }
     return map;
-  });
-
-  // Sync Homebrew real status into the status map
-  useEffect(() => {
-    setStatusMap((prev) => ({ ...prev, homebrew: homebrew.status }));
-  }, [homebrew.status]);
+  }, [detection.statusMap]);
 
   const installTool = useCallback(
     (toolId: string) => {
-      // For Homebrew, use the real installer
-      if (toolId === "homebrew") {
-        homebrew.installHomebrew();
-        return;
+      const installer = detection.installMap[toolId];
+      if (installer) {
+        installer();
       }
-
-      // For other tools, still mock for now
-      setStatusMap((prev) => ({ ...prev, [toolId]: "installing" }));
-      const delay = 1500 + Math.random() * 1500;
-      setTimeout(() => {
-        setStatusMap((prev) => ({ ...prev, [toolId]: "installed" }));
-      }, delay);
     },
-    [homebrew],
+    [detection.installMap],
   );
 
   const retryTool = useCallback(
@@ -51,6 +51,12 @@ export function useInstallationState() {
       .filter((s) => s.isPrerequisite)
       .every((s) => s.tools.every((t) => statusMap[t.id] === "installed"));
   }, [statusMap]);
+
+  const isCheckingPrerequisite = useMemo(() => {
+    return installationSections
+      .filter((s) => s.isPrerequisite)
+      .some((s) => s.tools.some((t) => detection.checkingMap[t.id]));
+  }, [detection.checkingMap]);
 
   const allTools = useMemo(() => getAllTools(installationSections), []);
   const installedCount = useMemo(
@@ -67,7 +73,7 @@ export function useInstallationState() {
     installTool,
     retryTool,
     isPrerequisiteMet,
-    isCheckingPrerequisite: homebrew.checking,
+    isCheckingPrerequisite,
     installedCount,
     totalCount,
     progressPercent,
