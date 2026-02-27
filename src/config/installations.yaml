@@ -27,7 +27,7 @@ sections:
     description: Programming languages, SDKs, and runtime managers
     tools:
       - id: nvm
-        name: nvm
+        name: nvm (Node version management)
         description: "Node Version Manager — manage multiple Node.js versions"
         icon: "🟩"
         checkCommand: "test -d $HOME/.nvm"
@@ -95,23 +95,20 @@ sections:
             variant: destructive
             separatorBefore: true
 
-      - id: flutter
-        name: Flutter
-        description: "Google's UI toolkit for building natively compiled apps"
-        icon: "🦋"
-        checkCommand: "test -x /opt/homebrew/bin/flutter || test -d $HOME/flutter"
-        installCommand: "/opt/homebrew/bin/brew install --cask flutter"
-        brewCaskName: flutter
-        versionCommand: "/opt/homebrew/bin/flutter --version 2>/dev/null | head -1"
+      - id: fvm
+        name: fvm (Flutter Version Management)
+        description: "Flutter Version Management — manage multiple Flutter SDK versions"
+        icon: "🔄"
+        checkCommand: "command -v fvm >/dev/null 2>&1"
+        installCommand: "/opt/homebrew/bin/brew tap leoafarias/fvm && /opt/homebrew/bin/brew install fvm"
+        versionCommand: "/opt/homebrew/bin/fvm --version 2>/dev/null"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade --cask flutter"
-            fallbackCommand: ""
+            command: "/opt/homebrew/bin/brew upgrade fvm"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall --cask flutter"
-            fallbackCommand: "rm -rf $HOME/flutter"
+            command: "/opt/homebrew/bin/brew uninstall fvm && /opt/homebrew/bin/brew untap leoafarias/fvm"
             variant: destructive
             separatorBefore: true
 
