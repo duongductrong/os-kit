@@ -25,13 +25,24 @@ import { HugeiconsIcon } from "@hugeicons/react";
 const data = {
   navMain: [
     {
-      title: "Developer Apps",
+      title: "Setup",
       url: "#",
       icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
       isActive: true,
       items: [
         {
           title: "Installation",
+          url: "/installation",
+        },
+      ],
+    },
+    {
+      title: "Developer Apps",
+      url: "#",
+      icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
+      items: [
+        {
+          title: "Antigravity",
           url: "#",
         },
       ],
