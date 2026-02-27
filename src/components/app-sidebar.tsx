@@ -26,36 +26,28 @@ import { HugeiconsIcon } from "@hugeicons/react";
 const data = {
   navMain: [
     {
-      title: "Playground",
+      title: "Apps",
       url: "#",
       icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
+          title: "Installation",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "LLMs",
       url: "#",
       icon: <HugeiconsIcon icon={RoboticIcon} strokeWidth={2} />,
       items: [
         {
-          title: "Genesis",
+          title: "Ollama",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "LM Studio",
           url: "#",
         },
         {
@@ -83,29 +75,6 @@ const data = {
         },
         {
           title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
           url: "#",
         },
       ],
