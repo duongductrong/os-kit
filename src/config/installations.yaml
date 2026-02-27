@@ -1,4 +1,7 @@
 sections:
+  # ──────────────────────────────────────────────
+  # 1. Package Manager (prerequisite)
+  # ──────────────────────────────────────────────
   - id: package-manager
     title: Package Manager
     description: Required before installing other tools
@@ -16,27 +19,13 @@ sections:
             label: Upgrade version
             command: "/opt/homebrew/bin/brew update 2>/dev/null || /usr/local/bin/brew update 2>/dev/null"
 
-  - id: dev-essentials
-    title: Development Essentials
-    description: Core tools for software development
+  # ──────────────────────────────────────────────
+  # 2. Languages & Runtimes
+  # ──────────────────────────────────────────────
+  - id: languages-runtimes
+    title: Languages & Runtimes
+    description: Programming languages, SDKs, and runtime managers
     tools:
-      - id: git
-        name: Git
-        description: Distributed version control system
-        icon: "🔀"
-        checkCommand: "test -x /opt/homebrew/bin/git || test -x /usr/bin/git || test -x /usr/local/bin/git"
-        installCommand: "/opt/homebrew/bin/brew install git"
-        versionCommand: "/opt/homebrew/bin/git --version 2>/dev/null || /usr/bin/git --version 2>/dev/null"
-        actions:
-          - id: upgrade
-            label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade git"
-          - id: uninstall
-            label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall git"
-            variant: destructive
-            separatorBefore: true
-
       - id: nvm
         name: nvm
         description: "Node Version Manager — manage multiple Node.js versions"
@@ -106,108 +95,155 @@ sections:
             variant: destructive
             separatorBefore: true
 
-      - id: docker
-        name: Docker
-        description: Container platform for building and running apps
-        icon: "🐳"
-        checkCommand: "test -x /usr/local/bin/docker || test -x /opt/homebrew/bin/docker"
-        installCommand: "/opt/homebrew/bin/brew install --cask docker"
-        versionCommand: "/usr/local/bin/docker --version 2>/dev/null || /opt/homebrew/bin/docker --version 2>/dev/null"
+      - id: flutter
+        name: Flutter
+        description: "Google's UI toolkit for building natively compiled apps"
+        icon: "🦋"
+        checkCommand: "test -x /opt/homebrew/bin/flutter || test -d $HOME/flutter"
+        installCommand: "/opt/homebrew/bin/brew install --cask flutter"
+        versionCommand: "/opt/homebrew/bin/flutter --version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade --cask docker"
+            command: "/opt/homebrew/bin/brew upgrade --cask flutter"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall --cask docker"
+            command: "/opt/homebrew/bin/brew uninstall --cask flutter"
             variant: destructive
             separatorBefore: true
 
-      - id: orbstack
-        name: OrbStack
-        description: "Fast, lightweight Docker & Linux on macOS"
-        icon: "🪐"
-        checkCommand: 'test -d "/Applications/OrbStack.app" || test -x /usr/local/bin/orbctl'
-        installCommand: "/opt/homebrew/bin/brew install --cask orbstack"
-        versionCommand: "/usr/local/bin/orbctl version 2>/dev/null | head -1"
+      - id: composer
+        name: Composer
+        description: Dependency manager for PHP
+        icon: "🎼"
+        checkCommand: "test -x /opt/homebrew/bin/composer || test -x /usr/local/bin/composer"
+        installCommand: "/opt/homebrew/bin/brew install composer"
+        versionCommand: "/opt/homebrew/bin/composer --version 2>/dev/null | head -1 || /usr/local/bin/composer --version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade --cask orbstack"
+            command: "/opt/homebrew/bin/brew upgrade composer"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall --cask orbstack"
+            command: "/opt/homebrew/bin/brew uninstall composer"
             variant: destructive
             separatorBefore: true
 
-      - id: mysql
-        name: MySQL
-        description: Popular open-source relational database
-        icon: "🐬"
-        checkCommand: "test -x /opt/homebrew/bin/mysql || test -x /usr/local/bin/mysql"
-        installCommand: "/opt/homebrew/bin/brew install mysql"
-        versionCommand: "/opt/homebrew/bin/mysql --version 2>/dev/null || /usr/local/bin/mysql --version 2>/dev/null"
+  # ──────────────────────────────────────────────
+  # 3. Version Control
+  # ──────────────────────────────────────────────
+  - id: version-control
+    title: Version Control
+    description: Source code management and GUI clients
+    tools:
+      - id: git
+        name: Git
+        description: Distributed version control system
+        icon: "🔀"
+        checkCommand: "test -x /opt/homebrew/bin/git || test -x /usr/bin/git || test -x /usr/local/bin/git"
+        installCommand: "/opt/homebrew/bin/brew install git"
+        versionCommand: "/opt/homebrew/bin/git --version 2>/dev/null || /usr/bin/git --version 2>/dev/null"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade mysql"
+            command: "/opt/homebrew/bin/brew upgrade git"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall mysql"
+            command: "/opt/homebrew/bin/brew uninstall git"
             variant: destructive
             separatorBefore: true
 
-      - id: postgresql
-        name: PostgreSQL
-        description: Advanced open-source relational database
-        icon: "🐘"
-        checkCommand: "ls /opt/homebrew/opt/postgresql@*/bin/psql >/dev/null 2>&1 || test -x /opt/homebrew/bin/psql || test -x /usr/local/bin/psql"
-        installCommand: "/opt/homebrew/bin/brew install postgresql"
-        versionCommand: "$(ls /opt/homebrew/opt/postgresql@*/bin/psql 2>/dev/null | head -1) --version 2>/dev/null || /opt/homebrew/bin/psql --version 2>/dev/null || /usr/local/bin/psql --version 2>/dev/null"
+      - id: sourcetree
+        name: Sourcetree
+        description: Free Git GUI client by Atlassian
+        icon: "🌳"
+        checkCommand: 'test -d "/Applications/Sourcetree.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask sourcetree"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade postgresql"
+            command: "/opt/homebrew/bin/brew upgrade --cask sourcetree"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall postgresql"
+            command: "/opt/homebrew/bin/brew uninstall --cask sourcetree"
             variant: destructive
             separatorBefore: true
 
-      - id: redis
-        name: Redis
-        description: In-memory data store for caching and messaging
-        icon: "🔴"
-        checkCommand: "test -x /opt/homebrew/bin/redis-server || test -x /usr/local/bin/redis-server"
-        installCommand: "/opt/homebrew/bin/brew install redis"
-        versionCommand: "/opt/homebrew/bin/redis-server --version 2>/dev/null || /usr/local/bin/redis-server --version 2>/dev/null"
+  # ──────────────────────────────────────────────
+  # 4. Code Editors & IDEs
+  # ──────────────────────────────────────────────
+  - id: editors-ides
+    title: Code Editors & IDEs
+    description: Code editors and integrated development environments
+    tools:
+      - id: vscode
+        name: Visual Studio Code
+        description: Popular, extensible code editor by Microsoft
+        icon: "💠"
+        checkCommand: 'test -d "/Applications/Visual Studio Code.app" || test -x /usr/local/bin/code'
+        installCommand: "/opt/homebrew/bin/brew install --cask visual-studio-code"
+        versionCommand: "/usr/local/bin/code --version 2>/dev/null | head -1"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade redis"
+            command: "/opt/homebrew/bin/brew upgrade --cask visual-studio-code"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall redis"
+            command: "/opt/homebrew/bin/brew uninstall --cask visual-studio-code"
             variant: destructive
             separatorBefore: true
 
-      - id: nginx
-        name: nginx
-        description: High-performance HTTP server and reverse proxy
-        icon: "🌐"
-        checkCommand: "test -x /opt/homebrew/bin/nginx || test -x /usr/local/bin/nginx"
-        installCommand: "/opt/homebrew/bin/brew install nginx"
-        versionCommand: "/opt/homebrew/bin/nginx -v 2>&1 || /usr/local/bin/nginx -v 2>&1"
+      - id: cursor
+        name: Cursor
+        description: AI-first code editor built on VS Code
+        icon: "⚡"
+        checkCommand: 'test -d "/Applications/Cursor.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask cursor"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade nginx"
+            command: "/opt/homebrew/bin/brew upgrade --cask cursor"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall nginx"
+            command: "/opt/homebrew/bin/brew uninstall --cask cursor"
             variant: destructive
             separatorBefore: true
 
+      - id: antigravity
+        name: Antigravity
+        description: AI-powered IDE by Google DeepMind
+        icon: "🧲"
+        checkCommand: 'test -d "/Applications/Antigravity.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask google-antigravity"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask google-antigravity"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask google-antigravity"
+            variant: destructive
+            separatorBefore: true
+
+      - id: android-studio
+        name: Android Studio
+        description: Official IDE for Android development by Google
+        icon: "📱"
+        checkCommand: 'test -d "/Applications/Android Studio.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask android-studio"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask android-studio"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask android-studio"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 5. Terminal & Shell
+  # ──────────────────────────────────────────────
   - id: terminal-shell
     title: "Terminal & Shell"
     description: Enhance your terminal experience
@@ -263,7 +299,7 @@ sections:
       - id: ohmyzsh
         name: Oh My Zsh
         description: Framework for managing Zsh configuration
-        icon: "⚡"
+        icon: "⚙️"
         checkCommand: "test -d $HOME/.oh-my-zsh"
         installCommand: 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
         actions:
@@ -290,5 +326,449 @@ sections:
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall starship"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 6. Containers & Virtualization
+  # ──────────────────────────────────────────────
+  - id: containers
+    title: Containers & Virtualization
+    description: Container runtimes and lightweight VM solutions
+    tools:
+      - id: docker
+        name: Docker
+        description: Container platform for building and running apps
+        icon: "🐳"
+        checkCommand: "test -x /usr/local/bin/docker || test -x /opt/homebrew/bin/docker"
+        installCommand: "/opt/homebrew/bin/brew install --cask docker"
+        versionCommand: "/usr/local/bin/docker --version 2>/dev/null || /opt/homebrew/bin/docker --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask docker"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask docker"
+            variant: destructive
+            separatorBefore: true
+
+      - id: orbstack
+        name: OrbStack
+        description: "Fast, lightweight Docker & Linux on macOS"
+        icon: "🪐"
+        checkCommand: 'test -d "/Applications/OrbStack.app" || test -x /usr/local/bin/orbctl'
+        installCommand: "/opt/homebrew/bin/brew install --cask orbstack"
+        versionCommand: "/usr/local/bin/orbctl version 2>/dev/null | head -1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask orbstack"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask orbstack"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 7. Databases & Data Tools
+  # ──────────────────────────────────────────────
+  - id: databases
+    title: Databases & Data Tools
+    description: Database servers and management GUIs
+    tools:
+      - id: mysql
+        name: MySQL
+        description: Popular open-source relational database
+        icon: "🐬"
+        checkCommand: "test -x /opt/homebrew/bin/mysql || test -x /usr/local/bin/mysql"
+        installCommand: "/opt/homebrew/bin/brew install mysql"
+        versionCommand: "/opt/homebrew/bin/mysql --version 2>/dev/null || /usr/local/bin/mysql --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade mysql"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall mysql"
+            variant: destructive
+            separatorBefore: true
+
+      - id: postgresql
+        name: PostgreSQL
+        description: Advanced open-source relational database
+        icon: "🐘"
+        checkCommand: "ls /opt/homebrew/opt/postgresql@*/bin/psql >/dev/null 2>&1 || test -x /opt/homebrew/bin/psql || test -x /usr/local/bin/psql"
+        installCommand: "/opt/homebrew/bin/brew install postgresql"
+        versionCommand: "$(ls /opt/homebrew/opt/postgresql@*/bin/psql 2>/dev/null | head -1) --version 2>/dev/null || /opt/homebrew/bin/psql --version 2>/dev/null || /usr/local/bin/psql --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade postgresql"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall postgresql"
+            variant: destructive
+            separatorBefore: true
+
+      - id: redis
+        name: Redis
+        description: In-memory data store for caching and messaging
+        icon: "🔴"
+        checkCommand: "test -x /opt/homebrew/bin/redis-server || test -x /usr/local/bin/redis-server"
+        installCommand: "/opt/homebrew/bin/brew install redis"
+        versionCommand: "/opt/homebrew/bin/redis-server --version 2>/dev/null || /usr/local/bin/redis-server --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade redis"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall redis"
+            variant: destructive
+            separatorBefore: true
+
+      - id: mongodb
+        name: MongoDB
+        description: Document-oriented NoSQL database
+        icon: "🍃"
+        checkCommand: "test -x /opt/homebrew/bin/mongod || test -x /usr/local/bin/mongod"
+        installCommand: "/opt/homebrew/bin/brew tap mongodb/brew && /opt/homebrew/bin/brew install mongodb-community"
+        versionCommand: "/opt/homebrew/bin/mongod --version 2>/dev/null | head -1 || /usr/local/bin/mongod --version 2>/dev/null | head -1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade mongodb-community"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall mongodb-community"
+            variant: destructive
+            separatorBefore: true
+
+      - id: mongodb-compass
+        name: MongoDB Compass
+        description: Official GUI for MongoDB
+        icon: "🧭"
+        checkCommand: 'test -d "/Applications/MongoDB Compass.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask mongodb-compass"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask mongodb-compass"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask mongodb-compass"
+            variant: destructive
+            separatorBefore: true
+
+      - id: studio-3t
+        name: Studio 3T
+        description: Professional GUI and IDE for MongoDB
+        icon: "🗄️"
+        checkCommand: 'test -d "/Applications/Studio 3T.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask studio-3t"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask studio-3t"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask studio-3t"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 8. Cloud & Infrastructure
+  # ──────────────────────────────────────────────
+  - id: cloud-infra
+    title: Cloud & Infrastructure
+    description: Cloud CLIs and server tools
+    tools:
+      - id: aws-cli
+        name: AWS CLI
+        description: Official command-line interface for Amazon Web Services
+        icon: "☁️"
+        checkCommand: "test -x /opt/homebrew/bin/aws || test -x /usr/local/bin/aws"
+        installCommand: "/opt/homebrew/bin/brew install awscli"
+        versionCommand: "/opt/homebrew/bin/aws --version 2>/dev/null || /usr/local/bin/aws --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade awscli"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall awscli"
+            variant: destructive
+            separatorBefore: true
+
+      - id: gcloud-cli
+        name: Google Cloud CLI
+        description: Command-line tools for Google Cloud Platform
+        icon: "🌩️"
+        checkCommand: "test -x /opt/homebrew/bin/gcloud || test -x /usr/local/bin/gcloud"
+        installCommand: "/opt/homebrew/bin/brew install --cask google-cloud-sdk"
+        versionCommand: "gcloud --version 2>/dev/null | head -1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask google-cloud-sdk"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask google-cloud-sdk"
+            variant: destructive
+            separatorBefore: true
+
+      - id: nginx
+        name: nginx
+        description: High-performance HTTP server and reverse proxy
+        icon: "🌐"
+        checkCommand: "test -x /opt/homebrew/bin/nginx || test -x /usr/local/bin/nginx"
+        installCommand: "/opt/homebrew/bin/brew install nginx"
+        versionCommand: "/opt/homebrew/bin/nginx -v 2>&1 || /usr/local/bin/nginx -v 2>&1"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade nginx"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall nginx"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 9. AI Tools
+  # ──────────────────────────────────────────────
+  - id: ai-tools
+    title: AI Tools
+    description: AI assistants, local models, and coding agents
+    tools:
+      - id: ollama
+        name: Ollama
+        description: Run large language models locally
+        icon: "🦙"
+        checkCommand: "test -x /opt/homebrew/bin/ollama || test -x /usr/local/bin/ollama"
+        installCommand: "/opt/homebrew/bin/brew install ollama"
+        versionCommand: "/opt/homebrew/bin/ollama --version 2>/dev/null || /usr/local/bin/ollama --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade ollama"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall ollama"
+            variant: destructive
+            separatorBefore: true
+
+      - id: chatgpt
+        name: ChatGPT
+        description: Official desktop app for OpenAI ChatGPT
+        icon: "💬"
+        checkCommand: 'test -d "/Applications/ChatGPT.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask chatgpt"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask chatgpt"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask chatgpt"
+            variant: destructive
+            separatorBefore: true
+
+      - id: claude
+        name: Claude
+        description: Official desktop app for Anthropic Claude
+        icon: "🤖"
+        checkCommand: 'test -d "/Applications/Claude.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask claude"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask claude"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask claude"
+            variant: destructive
+            separatorBefore: true
+
+      - id: codex-app
+        name: Codex
+        description: AI coding agent desktop app by OpenAI
+        icon: "🧬"
+        checkCommand: 'test -d "/Applications/Codex.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask codex"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask codex"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask codex"
+            variant: destructive
+            separatorBefore: true
+
+      - id: codex-cli
+        name: Codex CLI
+        description: Terminal-based AI coding agent by OpenAI
+        icon: "🧪"
+        checkCommand: "command -v codex >/dev/null 2>&1"
+        installCommand: "npm install -g @openai/codex"
+        versionCommand: "codex --version 2>/dev/null"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "npm update -g @openai/codex"
+          - id: uninstall
+            label: Uninstall
+            command: "npm uninstall -g @openai/codex"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 10. Browsers
+  # ──────────────────────────────────────────────
+  - id: browsers
+    title: Browsers
+    description: Web browsers for development and daily use
+    tools:
+      - id: google-chrome
+        name: Google Chrome
+        description: Fast, secure web browser by Google
+        icon: "🔵"
+        checkCommand: 'test -d "/Applications/Google Chrome.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask google-chrome"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask google-chrome"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask google-chrome"
+            variant: destructive
+            separatorBefore: true
+
+      - id: firefox
+        name: Firefox
+        description: Privacy-focused open-source web browser by Mozilla
+        icon: "🦊"
+        checkCommand: 'test -d "/Applications/Firefox.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask firefox"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask firefox"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask firefox"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 11. Communication
+  # ──────────────────────────────────────────────
+  - id: communication
+    title: Communication
+    description: Messaging, chat, and team collaboration
+    tools:
+      - id: slack
+        name: Slack
+        description: Team messaging and collaboration platform
+        icon: "💼"
+        checkCommand: 'test -d "/Applications/Slack.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask slack"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask slack"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask slack"
+            variant: destructive
+            separatorBefore: true
+
+      - id: discord
+        name: Discord
+        description: Voice, video, and text communication platform
+        icon: "🎮"
+        checkCommand: 'test -d "/Applications/Discord.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask discord"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask discord"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask discord"
+            variant: destructive
+            separatorBefore: true
+
+      - id: telegram
+        name: Telegram
+        description: Cloud-based instant messaging app
+        icon: "✈️"
+        checkCommand: 'test -d "/Applications/Telegram.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask telegram"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask telegram"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask telegram"
+            variant: destructive
+            separatorBefore: true
+
+  # ──────────────────────────────────────────────
+  # 12. Productivity & Utilities
+  # ──────────────────────────────────────────────
+  - id: productivity
+    title: Productivity & Utilities
+    description: Launchers, note-taking, and remote desktop tools
+    tools:
+      - id: raycast
+        name: Raycast
+        description: "Blazingly fast launcher and productivity tool for macOS"
+        icon: "🔦"
+        checkCommand: 'test -d "/Applications/Raycast.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask raycast"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask raycast"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask raycast"
+            variant: destructive
+            separatorBefore: true
+
+      - id: notion
+        name: Notion
+        description: "All-in-one workspace for notes, docs, and projects"
+        icon: "📝"
+        checkCommand: 'test -d "/Applications/Notion.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask notion"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask notion"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask notion"
+            variant: destructive
+            separatorBefore: true
+
+      - id: anydesk
+        name: AnyDesk
+        description: Fast and lightweight remote desktop application
+        icon: "🖥️"
+        checkCommand: 'test -d "/Applications/AnyDesk.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask anydesk"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask anydesk"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask anydesk"
             variant: destructive
             separatorBefore: true
