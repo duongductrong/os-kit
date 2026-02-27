@@ -17,22 +17,59 @@ export interface ToolDetectionConfig {
   versionCommand?: string;
 }
 
+/** Callbacks for streaming shell output */
+export interface StreamCallbacks {
+  onStdout?: (line: string) => void;
+  onStderr?: (line: string) => void;
+  onStart?: () => void;
+  onEnd?: (exitCode: number) => void;
+}
+
 export interface ToolDetectionResult {
   id: string;
   status: ToolStatus;
   checking: boolean;
   version: string | null;
-  install: () => Promise<void>;
-  upgrade: () => Promise<void>;
-  uninstall: () => Promise<void>;
+  install: (stream?: StreamCallbacks) => Promise<void>;
+  upgrade: (stream?: StreamCallbacks) => Promise<void>;
+  uninstall: (stream?: StreamCallbacks) => Promise<void>;
   recheck: () => Promise<void>;
   hasUpgrade: boolean;
   hasUninstall: boolean;
 }
 
-/** Run a shell command and return the result */
+/** Run a shell command and return the result (non-streaming, for checks/versions) */
 async function execSh(command: string) {
   return Command.create("exec-sh", ["-c", command]).execute();
+}
+
+/** Spawn a shell command with streaming stdout/stderr callbacks. Returns exit code. */
+async function spawnSh(
+  command: string,
+  callbacks?: StreamCallbacks,
+): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const cmd = Command.create("exec-sh", ["-c", command]);
+
+    cmd.stdout.on("data", (line: string) => {
+      callbacks?.onStdout?.(line);
+    });
+
+    cmd.stderr.on("data", (line: string) => {
+      callbacks?.onStderr?.(line);
+    });
+
+    cmd.on("close", (data) => {
+      resolve(data.code ?? -1);
+    });
+
+    cmd.on("error", (error: string) => {
+      reject(new Error(error));
+    });
+
+    callbacks?.onStart?.();
+    cmd.spawn().catch(reject);
+  });
 }
 
 /** Fetch version string from a shell command */
@@ -50,6 +87,7 @@ async function fetchVersion(versionCommand: string): Promise<string | null> {
 
 /**
  * Generic hook to detect, get version, install, upgrade, and uninstall a CLI tool.
+ * Install/upgrade/uninstall now support streaming output via optional StreamCallbacks.
  */
 export function useToolDetection(
   config: ToolDetectionConfig,
@@ -80,63 +118,78 @@ export function useToolDetection(
     }
   }, [config.checkCommand, config.id, config.versionCommand]);
 
-  const install = useCallback(async () => {
-    if (!config.installCommand) return;
-    setStatus("installing");
-    try {
-      const result = await execSh(config.installCommand);
-      if (result.code === 0) {
-        setStatus("installed");
-        if (config.versionCommand) {
-          setVersion(await fetchVersion(config.versionCommand));
+  const install = useCallback(
+    async (stream?: StreamCallbacks) => {
+      if (!config.installCommand) return;
+      setStatus("installing");
+      try {
+        const exitCode = await spawnSh(config.installCommand, stream);
+        if (exitCode === 0) {
+          setStatus("installed");
+          if (config.versionCommand) {
+            setVersion(await fetchVersion(config.versionCommand));
+          }
+        } else {
+          console.error(`Install ${config.id} failed with code ${exitCode}`);
+          setStatus("failed");
         }
-      } else {
-        console.error(`Install ${config.id} failed:`, result.stderr);
+        stream?.onEnd?.(exitCode);
+      } catch (err) {
+        console.error(`Install ${config.id} error:`, err);
         setStatus("failed");
+        stream?.onEnd?.(-1);
       }
-    } catch (err) {
-      console.error(`Install ${config.id} error:`, err);
-      setStatus("failed");
-    }
-  }, [config.id, config.installCommand, config.versionCommand]);
+    },
+    [config.id, config.installCommand, config.versionCommand],
+  );
 
-  const upgrade = useCallback(async () => {
-    if (!config.upgradeCommand) return;
-    setStatus("installing");
-    try {
-      const result = await execSh(config.upgradeCommand);
-      if (result.code === 0) {
-        setStatus("installed");
-        if (config.versionCommand) {
-          setVersion(await fetchVersion(config.versionCommand));
+  const upgrade = useCallback(
+    async (stream?: StreamCallbacks) => {
+      if (!config.upgradeCommand) return;
+      setStatus("installing");
+      try {
+        const exitCode = await spawnSh(config.upgradeCommand, stream);
+        if (exitCode === 0) {
+          setStatus("installed");
+          if (config.versionCommand) {
+            setVersion(await fetchVersion(config.versionCommand));
+          }
+        } else {
+          console.error(`Upgrade ${config.id} failed with code ${exitCode}`);
+          setStatus("installed"); // still installed, just upgrade failed
         }
-      } else {
-        console.error(`Upgrade ${config.id} failed:`, result.stderr);
-        setStatus("installed"); // still installed, just upgrade failed
-      }
-    } catch (err) {
-      console.error(`Upgrade ${config.id} error:`, err);
-      setStatus("installed");
-    }
-  }, [config.id, config.upgradeCommand, config.versionCommand]);
-
-  const uninstall = useCallback(async () => {
-    if (!config.uninstallCommand) return;
-    setStatus("installing");
-    try {
-      const result = await execSh(config.uninstallCommand);
-      if (result.code === 0) {
-        setStatus("idle");
-        setVersion(null);
-      } else {
-        console.error(`Uninstall ${config.id} failed:`, result.stderr);
+        stream?.onEnd?.(exitCode);
+      } catch (err) {
+        console.error(`Upgrade ${config.id} error:`, err);
         setStatus("installed");
+        stream?.onEnd?.(-1);
       }
-    } catch (err) {
-      console.error(`Uninstall ${config.id} error:`, err);
-      setStatus("installed");
-    }
-  }, [config.id, config.uninstallCommand]);
+    },
+    [config.id, config.upgradeCommand, config.versionCommand],
+  );
+
+  const uninstall = useCallback(
+    async (stream?: StreamCallbacks) => {
+      if (!config.uninstallCommand) return;
+      setStatus("installing");
+      try {
+        const exitCode = await spawnSh(config.uninstallCommand, stream);
+        if (exitCode === 0) {
+          setStatus("idle");
+          setVersion(null);
+        } else {
+          console.error(`Uninstall ${config.id} failed with code ${exitCode}`);
+          setStatus("installed");
+        }
+        stream?.onEnd?.(exitCode);
+      } catch (err) {
+        console.error(`Uninstall ${config.id} error:`, err);
+        setStatus("installed");
+        stream?.onEnd?.(-1);
+      }
+    },
+    [config.id, config.uninstallCommand],
+  );
 
   useEffect(() => {
     check();
@@ -164,9 +217,18 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
 
   const statusMap: Record<string, ToolStatus> = {};
   const checkingMap: Record<string, boolean> = {};
-  const installMap: Record<string, () => Promise<void>> = {};
-  const upgradeMap: Record<string, () => Promise<void>> = {};
-  const uninstallMap: Record<string, () => Promise<void>> = {};
+  const installMap: Record<
+    string,
+    (stream?: StreamCallbacks) => Promise<void>
+  > = {};
+  const upgradeMap: Record<
+    string,
+    (stream?: StreamCallbacks) => Promise<void>
+  > = {};
+  const uninstallMap: Record<
+    string,
+    (stream?: StreamCallbacks) => Promise<void>
+  > = {};
   const versionMap: Record<string, string | null> = {};
   const capabilityMap: Record<
     string,

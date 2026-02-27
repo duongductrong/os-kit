@@ -17,7 +17,9 @@ import type {
   ToolAction,
   ToolStatus,
 } from "../utils/installation-data";
+import type { ToolLogState } from "@/hooks/use-tool-logs";
 import { NvmVersionPanel } from "./nvm-version-panel";
+import { TerminalLog } from "./terminal-log";
 
 /** Map well-known action IDs to SVG icon paths */
 function ActionIcon({ actionId }: { actionId: string }) {
@@ -76,9 +78,11 @@ interface InstallationItemProps {
   status: ToolStatus;
   version: string | null;
   actions: ToolAction[];
+  logState?: ToolLogState;
   onInstall: () => void;
   onRetry: () => void;
   onAction: (actionId: string) => void;
+  onClearLog?: () => void;
   disabled?: boolean;
 }
 
@@ -87,9 +91,11 @@ export function InstallationItem({
   status,
   version,
   actions,
+  logState,
   onInstall,
   onRetry,
   onAction,
+  onClearLog,
   disabled,
 }: InstallationItemProps) {
   const [expanded, setExpanded] = useState(false);
@@ -199,6 +205,11 @@ export function InstallationItem({
           </div>
         </SectionItemControl>
       </SectionItem>
+
+      {/* Terminal log panel */}
+      {logState && onClearLog && (
+        <TerminalLog logState={logState} onClear={onClearLog} />
+      )}
 
       {/* Expandable detail panel */}
       {tool.hasDetails && expanded && status === "installed" && (

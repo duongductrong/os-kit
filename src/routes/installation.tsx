@@ -14,9 +14,11 @@ export default function Installation() {
     statusMap,
     versionMap,
     actionsMap,
+    logsMap,
     installTool,
     executeAction,
     retryTool,
+    clearLog,
     isPrerequisiteMet,
     isCheckingPrerequisite,
     installedCount,
@@ -52,9 +54,11 @@ export default function Installation() {
               statusMap={statusMap}
               versionMap={versionMap}
               actionsMap={actionsMap}
+              logsMap={logsMap}
               onInstall={installTool}
               onRetry={retryTool}
               onAction={executeAction}
+              onClearLog={clearLog}
               isLocked={isLocked}
               isChecking={section.isPrerequisite && isCheckingPrerequisite}
               showConnector={index > 0}

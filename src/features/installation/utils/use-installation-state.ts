@@ -8,12 +8,17 @@ import type { ToolAction } from "./installation-data";
 import type { ToolStatus } from "@/lib/types";
 import {
   useMultiToolDetection,
+  type StreamCallbacks,
   type ToolDetectionConfig,
 } from "@/hooks/use-tool-detection";
+import { useToolLogs } from "@/hooks/use-tool-logs";
 
 export function useInstallationState() {
   // Load sections from YAML (synchronous — bundled at build time)
   const sections = useMemo(() => loadInstallationSections(), []);
+
+  // Log state management
+  const { logsMap, appendLog, startLog, endLog, clearLog } = useToolLogs();
 
   // Build detection configs from all tools that have a checkCommand
   const detectionConfigs: ToolDetectionConfig[] = useMemo(() => {
@@ -50,28 +55,50 @@ export function useInstallationState() {
     return map;
   }, [sections]);
 
+  /** Create StreamCallbacks that pipe output into the log store */
+  const makeStreamCallbacks = useCallback(
+    (toolId: string): StreamCallbacks => ({
+      onStart: () => startLog(toolId),
+      onStdout: (line: string) =>
+        appendLog(toolId, {
+          text: line,
+          stream: "stdout",
+          timestamp: Date.now(),
+        }),
+      onStderr: (line: string) =>
+        appendLog(toolId, {
+          text: line,
+          stream: "stderr",
+          timestamp: Date.now(),
+        }),
+      onEnd: (exitCode: number) => endLog(toolId, exitCode),
+    }),
+    [appendLog, startLog, endLog],
+  );
+
   const installTool = useCallback(
     (toolId: string) => {
       const installer = detection.installMap[toolId];
       if (installer) {
-        installer();
+        installer(makeStreamCallbacks(toolId));
       }
     },
-    [detection.installMap],
+    [detection.installMap, makeStreamCallbacks],
   );
 
   const executeAction = useCallback(
     (toolId: string, actionId: string) => {
+      const stream = makeStreamCallbacks(toolId);
       if (actionId === "upgrade") {
         const upgrader = detection.upgradeMap[toolId];
-        if (upgrader) upgrader();
+        if (upgrader) upgrader(stream);
       } else if (actionId === "uninstall") {
         const uninstaller = detection.uninstallMap[toolId];
-        if (uninstaller) uninstaller();
+        if (uninstaller) uninstaller(stream);
       }
       // Future: handle custom action IDs via a generic exec mechanism
     },
-    [detection.upgradeMap, detection.uninstallMap],
+    [detection.upgradeMap, detection.uninstallMap, makeStreamCallbacks],
   );
 
   const retryTool = useCallback(
@@ -107,9 +134,11 @@ export function useInstallationState() {
     statusMap,
     versionMap: detection.versionMap,
     actionsMap,
+    logsMap,
     installTool,
     executeAction,
     retryTool,
+    clearLog,
     isPrerequisiteMet,
     isCheckingPrerequisite,
     installedCount,

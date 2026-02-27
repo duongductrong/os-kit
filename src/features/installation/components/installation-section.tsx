@@ -11,6 +11,7 @@ import type {
   ToolAction,
   ToolStatus,
 } from "../utils/installation-data";
+import type { ToolLogState } from "@/hooks/use-tool-logs";
 import { InstallationItem } from "./installation-item";
 
 interface InstallationSectionProps {
@@ -18,9 +19,11 @@ interface InstallationSectionProps {
   statusMap: Record<string, ToolStatus>;
   versionMap: Record<string, string | null>;
   actionsMap: Record<string, ToolAction[]>;
+  logsMap: Record<string, ToolLogState>;
   onInstall: (toolId: string) => void;
   onRetry: (toolId: string) => void;
   onAction: (toolId: string, actionId: string) => void;
+  onClearLog: (toolId: string) => void;
   isLocked: boolean;
   isChecking?: boolean;
   showConnector?: boolean;
@@ -31,9 +34,11 @@ export function InstallationSection({
   statusMap,
   versionMap,
   actionsMap,
+  logsMap,
   onInstall,
   onRetry,
   onAction,
+  onClearLog,
   isLocked,
   isChecking = false,
   showConnector = false,
@@ -80,9 +85,11 @@ export function InstallationSection({
                 status={statusMap[tool.id] ?? "idle"}
                 version={versionMap[tool.id] ?? null}
                 actions={actions}
+                logState={logsMap[tool.id]}
                 onInstall={() => onInstall(tool.id)}
                 onRetry={() => onRetry(tool.id)}
                 onAction={(actionId) => onAction(tool.id, actionId)}
+                onClearLog={() => onClearLog(tool.id)}
                 disabled={isLocked}
               />
             );

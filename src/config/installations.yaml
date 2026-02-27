@@ -161,16 +161,16 @@ sections:
         name: PostgreSQL
         description: Advanced open-source relational database
         icon: "🐘"
-        checkCommand: "test -x /opt/homebrew/bin/psql || test -x /usr/local/bin/psql"
-        installCommand: "/opt/homebrew/bin/brew install postgresql@16"
-        versionCommand: "/opt/homebrew/bin/psql --version 2>/dev/null || /usr/local/bin/psql --version 2>/dev/null"
+        checkCommand: "ls /opt/homebrew/opt/postgresql@*/bin/psql >/dev/null 2>&1 || test -x /opt/homebrew/bin/psql || test -x /usr/local/bin/psql"
+        installCommand: "/opt/homebrew/bin/brew install postgresql"
+        versionCommand: "$(ls /opt/homebrew/opt/postgresql@*/bin/psql 2>/dev/null | head -1) --version 2>/dev/null || /opt/homebrew/bin/psql --version 2>/dev/null || /usr/local/bin/psql --version 2>/dev/null"
         actions:
           - id: upgrade
             label: Upgrade version
-            command: "/opt/homebrew/bin/brew upgrade postgresql@16"
+            command: "/opt/homebrew/bin/brew upgrade postgresql"
           - id: uninstall
             label: Uninstall
-            command: "/opt/homebrew/bin/brew uninstall postgresql@16"
+            command: "/opt/homebrew/bin/brew uninstall postgresql"
             variant: destructive
             separatorBefore: true
 
@@ -225,6 +225,38 @@ sections:
           - id: uninstall
             label: Uninstall
             command: "/opt/homebrew/bin/brew uninstall --cask iterm2"
+            variant: destructive
+            separatorBefore: true
+
+      - id: warp
+        name: Warp
+        description: "Modern, Rust-based terminal with AI built in"
+        icon: "🌀"
+        checkCommand: 'test -d "/Applications/Warp.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask warp"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask warp"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask warp"
+            variant: destructive
+            separatorBefore: true
+
+      - id: ghostty
+        name: Ghostty
+        description: "Fast, native terminal emulator by Mitchell Hashimoto"
+        icon: "👻"
+        checkCommand: 'test -d "/Applications/Ghostty.app"'
+        installCommand: "/opt/homebrew/bin/brew install --cask ghostty"
+        actions:
+          - id: upgrade
+            label: Upgrade version
+            command: "/opt/homebrew/bin/brew upgrade --cask ghostty"
+          - id: uninstall
+            label: Uninstall
+            command: "/opt/homebrew/bin/brew uninstall --cask ghostty"
             variant: destructive
             separatorBefore: true
 
