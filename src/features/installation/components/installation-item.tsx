@@ -26,6 +26,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Setting07Icon } from "@hugeicons/core-free-icons";
 
 /** Map well-known action IDs to SVG icon paths */
 function ActionIcon({ actionId }: { actionId: string }) {
@@ -179,19 +181,10 @@ export function InstallationItem({
                       variant="ghost"
                       aria-label="Tool settings"
                     >
-                      <svg
-                        className="size-3.5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
+                      <HugeiconsIcon
+                        icon={Setting07Icon}
+                        className="size-4 text-muted-foreground"
+                      />
                     </Button>
                   }
                 />
