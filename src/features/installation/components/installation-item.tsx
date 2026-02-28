@@ -94,6 +94,7 @@ interface InstallationItemProps {
   onAction: (actionId: string) => void;
   onClearLog?: () => void;
   disabled?: boolean;
+  outdatedVersion?: string | null;
 }
 
 export function InstallationItem({
@@ -109,6 +110,7 @@ export function InstallationItem({
   onAction,
   onClearLog,
   disabled,
+  outdatedVersion,
 }: InstallationItemProps) {
   const [expanded, setExpanded] = useState(false);
   const showSettings = status === "installed" && actions.length > 0;
@@ -151,6 +153,11 @@ export function InstallationItem({
                     </TooltipContent>
                   </Tooltip>
                 )}
+              {status === "installed" && outdatedVersion && (
+                <span className="inline-flex items-center rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">
+                  → {outdatedVersion}
+                </span>
+              )}
             </span>
           </SectionItemLabel>
         </div>

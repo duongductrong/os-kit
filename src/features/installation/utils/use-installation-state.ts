@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   getAllTools,
   getToolAction,
@@ -14,6 +14,7 @@ import {
   type ToolDetectionConfig,
 } from "@/hooks/use-tool-detection";
 import { useToolLogs } from "@/hooks/use-tool-logs";
+import { Command } from "@tauri-apps/plugin-shell";
 
 export function useInstallationState() {
   // Load sections from YAML (synchronous — bundled at build time)
@@ -177,6 +178,35 @@ export function useInstallationState() {
   }, [sections, detection.checkingMap]);
 
   const allTools = useMemo(() => getAllTools(sections), [sections]);
+
+  // Outdated packages map: tool ID → latest version
+  const [outdatedMap, setOutdatedMap] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchOutdated() {
+      try {
+        const result = await Command.create("exec-sh", [
+          "-c",
+          "/opt/homebrew/bin/brew outdated --json=v2 2>/dev/null",
+        ]).execute();
+        if (cancelled || result.code !== 0 || !result.stdout.trim()) return;
+        const json = JSON.parse(result.stdout);
+        const map: Record<string, string> = {};
+        for (const f of json.formulae ?? []) {
+          map[f.name] = f.current_version;
+        }
+        for (const c of json.casks ?? []) {
+          map[c.name] = c.current_version;
+        }
+        if (!cancelled) setOutdatedMap(map);
+      } catch {
+        // Homebrew not installed — skip
+      }
+    }
+    fetchOutdated();
+    return () => { cancelled = true; };
+  }, []);
+
   const installedCount = useMemo(
     () => allTools.filter((t) => statusMap[t.id] === "installed").length,
     [allTools, statusMap],
@@ -193,6 +223,7 @@ export function useInstallationState() {
     managedByMap,
     actionsMap: effectiveActionsMap,
     logsMap,
+    outdatedMap,
     installTool,
     executeAction,
     retryTool,

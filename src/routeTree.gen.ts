@@ -9,18 +9,60 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SystemInfoRouteImport } from './routes/system-info'
+import { Route as SshRouteImport } from './routes/ssh'
 import { Route as ShellRouteImport } from './routes/shell'
+import { Route as RecipeRouteImport } from './routes/recipe'
+import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as PortsRouteImport } from './routes/ports'
 import { Route as InstallationRouteImport } from './routes/installation'
+import { Route as HostsRouteImport } from './routes/hosts'
+import { Route as GitConfigRouteImport } from './routes/git-config'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SystemInfoRoute = SystemInfoRouteImport.update({
+  id: '/system-info',
+  path: '/system-info',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SshRoute = SshRouteImport.update({
+  id: '/ssh',
+  path: '/ssh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShellRoute = ShellRouteImport.update({
   id: '/shell',
   path: '/shell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipeRoute = RecipeRouteImport.update({
+  id: '/recipe',
+  path: '/recipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortsRoute = PortsRouteImport.update({
+  id: '/ports',
+  path: '/ports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstallationRoute = InstallationRouteImport.update({
   id: '/installation',
   path: '/installation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostsRoute = HostsRouteImport.update({
+  id: '/hosts',
+  path: '/hosts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GitConfigRoute = GitConfigRouteImport.update({
+  id: '/git-config',
+  path: '/git-config',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,36 +73,109 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/git-config': typeof GitConfigRoute
+  '/hosts': typeof HostsRoute
   '/installation': typeof InstallationRoute
+  '/ports': typeof PortsRoute
+  '/projects': typeof ProjectsRoute
+  '/recipe': typeof RecipeRoute
   '/shell': typeof ShellRoute
+  '/ssh': typeof SshRoute
+  '/system-info': typeof SystemInfoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/git-config': typeof GitConfigRoute
+  '/hosts': typeof HostsRoute
   '/installation': typeof InstallationRoute
+  '/ports': typeof PortsRoute
+  '/projects': typeof ProjectsRoute
+  '/recipe': typeof RecipeRoute
   '/shell': typeof ShellRoute
+  '/ssh': typeof SshRoute
+  '/system-info': typeof SystemInfoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/git-config': typeof GitConfigRoute
+  '/hosts': typeof HostsRoute
   '/installation': typeof InstallationRoute
+  '/ports': typeof PortsRoute
+  '/projects': typeof ProjectsRoute
+  '/recipe': typeof RecipeRoute
   '/shell': typeof ShellRoute
+  '/ssh': typeof SshRoute
+  '/system-info': typeof SystemInfoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/installation' | '/shell'
+  fullPaths:
+    | '/'
+    | '/git-config'
+    | '/hosts'
+    | '/installation'
+    | '/ports'
+    | '/projects'
+    | '/recipe'
+    | '/shell'
+    | '/ssh'
+    | '/system-info'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/installation' | '/shell'
-  id: '__root__' | '/' | '/installation' | '/shell'
+  to:
+    | '/'
+    | '/git-config'
+    | '/hosts'
+    | '/installation'
+    | '/ports'
+    | '/projects'
+    | '/recipe'
+    | '/shell'
+    | '/ssh'
+    | '/system-info'
+  id:
+    | '__root__'
+    | '/'
+    | '/git-config'
+    | '/hosts'
+    | '/installation'
+    | '/ports'
+    | '/projects'
+    | '/recipe'
+    | '/shell'
+    | '/ssh'
+    | '/system-info'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GitConfigRoute: typeof GitConfigRoute
+  HostsRoute: typeof HostsRoute
   InstallationRoute: typeof InstallationRoute
+  PortsRoute: typeof PortsRoute
+  ProjectsRoute: typeof ProjectsRoute
+  RecipeRoute: typeof RecipeRoute
   ShellRoute: typeof ShellRoute
+  SshRoute: typeof SshRoute
+  SystemInfoRoute: typeof SystemInfoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/system-info': {
+      id: '/system-info'
+      path: '/system-info'
+      fullPath: '/system-info'
+      preLoaderRoute: typeof SystemInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ssh': {
+      id: '/ssh'
+      path: '/ssh'
+      fullPath: '/ssh'
+      preLoaderRoute: typeof SshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shell': {
       id: '/shell'
       path: '/shell'
@@ -68,11 +183,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipe': {
+      id: '/recipe'
+      path: '/recipe'
+      fullPath: '/recipe'
+      preLoaderRoute: typeof RecipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ports': {
+      id: '/ports'
+      path: '/ports'
+      fullPath: '/ports'
+      preLoaderRoute: typeof PortsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/installation': {
       id: '/installation'
       path: '/installation'
       fullPath: '/installation'
       preLoaderRoute: typeof InstallationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hosts': {
+      id: '/hosts'
+      path: '/hosts'
+      fullPath: '/hosts'
+      preLoaderRoute: typeof HostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/git-config': {
+      id: '/git-config'
+      path: '/git-config'
+      fullPath: '/git-config'
+      preLoaderRoute: typeof GitConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,8 +237,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GitConfigRoute: GitConfigRoute,
+  HostsRoute: HostsRoute,
   InstallationRoute: InstallationRoute,
+  PortsRoute: PortsRoute,
+  ProjectsRoute: ProjectsRoute,
+  RecipeRoute: RecipeRoute,
   ShellRoute: ShellRoute,
+  SshRoute: SshRoute,
+  SystemInfoRoute: SystemInfoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

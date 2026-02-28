@@ -21,8 +21,12 @@ import {
   Setting07Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useOutdatedCount } from "@/hooks/use-outdated-count";
 
-const data = {
+function useNavData() {
+  const outdatedCount = useOutdatedCount();
+
+  return {
   navMain: [
     {
       title: "Mac",
@@ -33,10 +37,39 @@ const data = {
         {
           title: "Installation",
           url: "/installation",
+          badge: outdatedCount,
         },
         {
           title: "Shell",
           url: "/shell",
+        },
+        {
+          title: "Git Config",
+          url: "/git-config",
+        },
+        {
+          title: "SSH",
+          url: "/ssh",
+        },
+        {
+          title: "Hosts",
+          url: "/hosts",
+        },
+        {
+          title: "Ports",
+          url: "/ports",
+        },
+        {
+          title: "System Info",
+          url: "/system-info",
+        },
+        {
+          title: "Projects",
+          url: "/projects",
+        },
+        {
+          title: "Recipe",
+          url: "/recipe",
         },
       ],
     },
@@ -147,7 +180,10 @@ const data = {
     },
   ],
 };
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const data = useNavData();
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader className="h-8">

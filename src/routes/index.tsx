@@ -10,15 +10,26 @@ import {
   SectionItemLabel,
   SectionItemControl,
 } from "@/components/ui/section";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useSettings } from "@/contexts/settings-context";
 
-export const Route = createFileRoute("/")({
-  component: Index,
-});
+export const Route = createFileRoute("/")(
+  { component: Index },
+);
 
 export default function Index() {
+  const { settings, updateSetting } = useSettings();
+
   return (
-    <div className="flex flex-col gap-8 max-w-2xl mx-auto  w-full">
-      {/* Example 1: General settings */}
+    <div className="flex flex-col gap-8 max-w-2xl mx-auto w-full">
+      {/* General settings */}
       <Section>
         <SectionHeader>
           <SectionTitle>General</SectionTitle>
@@ -31,10 +42,27 @@ export default function Index() {
           <SectionItem>
             <SectionItemLabel
               title="Default open destination"
-              description="Where files and folders open by default"
+              description="Where the app navigates on launch"
             />
             <SectionItemControl>
-              <span className="text-sm text-muted-foreground">Antigravity</span>
+              <Select
+                value={settings.defaultOpenDestination}
+                onValueChange={(val) =>
+                  updateSetting(
+                    "defaultOpenDestination",
+                    val as typeof settings.defaultOpenDestination,
+                  )
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="installation">Installation</SelectItem>
+                  <SelectItem value="shell">Shell</SelectItem>
+                  <SelectItem value="settings">Settings</SelectItem>
+                </SelectContent>
+              </Select>
             </SectionItemControl>
           </SectionItem>
 
@@ -44,7 +72,20 @@ export default function Index() {
               description="Language for the app UI"
             />
             <SectionItemControl>
-              <span className="text-sm text-muted-foreground">Auto Detect</span>
+              <Select
+                value={settings.language}
+                onValueChange={(val) =>
+                  updateSetting("language", val as typeof settings.language)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="vi">Tiếng Việt</SelectItem>
+                </SelectContent>
+              </Select>
             </SectionItemControl>
           </SectionItem>
 
@@ -54,13 +95,16 @@ export default function Index() {
               description="Keep your computer awake while running a thread"
             />
             <SectionItemControl>
-              <div className="h-5 w-9 rounded-full bg-muted" />
+              <Switch
+                checked={settings.preventSleep}
+                onCheckedChange={(val) => updateSetting("preventSleep", val)}
+              />
             </SectionItemControl>
           </SectionItem>
         </SectionContent>
       </Section>
 
-      {/* Example 2: Appearance section */}
+      {/* Appearance section */}
       <Section>
         <SectionHeader>
           <SectionTitle>Appearance</SectionTitle>
@@ -73,7 +117,21 @@ export default function Index() {
               description="Use light, dark, or match your system"
             />
             <SectionItemControl>
-              <span className="text-sm text-muted-foreground">System</span>
+              <Select
+                value={settings.theme}
+                onValueChange={(val) =>
+                  updateSetting("theme", val as typeof settings.theme)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="system">System</SelectItem>
+                  <SelectItem value="light">Light</SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                </SelectContent>
+              </Select>
             </SectionItemControl>
           </SectionItem>
 
@@ -83,17 +141,37 @@ export default function Index() {
               description="Make windows use a solid background rather than system translucency"
             />
             <SectionItemControl>
-              <div className="h-5 w-9 rounded-full bg-muted" />
+              <Switch
+                checked={settings.opaqueBackground}
+                onCheckedChange={(val) =>
+                  updateSetting("opaqueBackground", val)
+                }
+              />
             </SectionItemControl>
           </SectionItem>
 
           <SectionItem>
             <SectionItemLabel
-              title="Sans font family"
-              description="Adjust the font used for the UI"
+              title="Font size"
+              description="Adjust the base font size for the UI"
             />
             <SectionItemControl>
-              <span className="text-sm text-muted-foreground">14px</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min={12}
+                  max={20}
+                  step={1}
+                  value={settings.fontSize}
+                  onChange={(e) =>
+                    updateSetting("fontSize", Number(e.target.value))
+                  }
+                  className="w-24 accent-primary"
+                />
+                <span className="text-sm text-muted-foreground font-mono w-8 text-right">
+                  {settings.fontSize}px
+                </span>
+              </div>
             </SectionItemControl>
           </SectionItem>
         </SectionContent>

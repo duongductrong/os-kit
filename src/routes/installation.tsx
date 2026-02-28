@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
+import { HomebrewHealth } from "@/features/installation/components/homebrew-health";
 import { InstallationSearchbar } from "@/features/installation/components/installation-searchbar";
 import { InstallationSection } from "@/features/installation/components/installation-section";
 import { useInstallationState } from "@/features/installation/utils/use-installation-state";
@@ -18,6 +19,7 @@ export default function Installation() {
     managedByMap,
     actionsMap,
     logsMap,
+    outdatedMap,
     installTool,
     executeAction,
     retryTool,
@@ -55,6 +57,9 @@ export default function Installation() {
         </p>
       </div>
 
+      {/* Homebrew health check — only show when prerequisite met */}
+      {isPrerequisiteMet && <HomebrewHealth />}
+
       <InstallationSearchbar value={searchQuery} onChange={setSearchQuery} />
 
       {/* Sections flow */}
@@ -71,6 +76,7 @@ export default function Installation() {
               managedByMap={managedByMap}
               actionsMap={actionsMap}
               logsMap={logsMap}
+              outdatedMap={outdatedMap}
               onInstall={installTool}
               onRetry={retryTool}
               onAction={executeAction}

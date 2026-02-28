@@ -31,6 +31,7 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      badge?: number;
     }[];
   }[];
 }) {
@@ -69,6 +70,11 @@ export function NavMain({
                           render={<Link to={subItem.url} />}
                         >
                           <span>{subItem.title}</span>
+                          {subItem.badge != null && subItem.badge > 0 && (
+                            <span className="ml-auto inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                              {subItem.badge}
+                            </span>
+                          )}
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

@@ -23,6 +23,7 @@ interface InstallationSectionProps {
   managedByMap: Record<string, ManagedBy>;
   actionsMap: Record<string, ToolAction[]>;
   logsMap: Record<string, ToolLogState>;
+  outdatedMap?: Record<string, string>;
   onInstall: (toolId: string) => void;
   onRetry: (toolId: string) => void;
   onAction: (toolId: string, actionId: string) => void;
@@ -40,6 +41,7 @@ export function InstallationSection({
   managedByMap,
   actionsMap,
   logsMap,
+  outdatedMap,
   onInstall,
   onRetry,
   onAction,
@@ -98,6 +100,7 @@ export function InstallationSection({
                 onAction={(actionId) => onAction(tool.id, actionId)}
                 onClearLog={() => onClearLog(tool.id)}
                 disabled={isLocked}
+                outdatedVersion={outdatedMap?.[tool.id] ?? null}
               />
             );
           })}
