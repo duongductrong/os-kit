@@ -1,7 +1,7 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { ThemeProvider } from "./components/ui/theme-provider";
 import { TooltipProvider } from "./components/ui/tooltip";
 import "./globals.css";
 import { routeTree } from "./routeTree.gen";
@@ -12,9 +12,10 @@ const router = createRouter({
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <TooltipProvider>
-      <RouterProvider router={router} />
-      {/* {import.meta.env.MODE !== "production" ? (
+    <ThemeProvider>
+      <TooltipProvider>
+        <RouterProvider router={router} />
+        {/* {import.meta.env.MODE !== "production" ? (
         <TanStackRouterDevtools
           router={router}
           panelProps={{
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           }}
         />
       ) : null} */}
-    </TooltipProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 );

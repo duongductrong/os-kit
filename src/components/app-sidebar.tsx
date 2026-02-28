@@ -68,10 +68,6 @@ function useNavData() {
           url: "/system-info",
         },
         {
-          title: "Projects",
-          url: "/projects",
-        },
-        {
           title: "Recipe",
           url: "/recipe",
         },
