@@ -15,6 +15,7 @@ import { Route as ShellRouteImport } from './routes/shell'
 import { Route as RecipeRouteImport } from './routes/recipe'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PortsRouteImport } from './routes/ports'
+import { Route as LocalDomainsRouteImport } from './routes/local-domains'
 import { Route as InstallationRouteImport } from './routes/installation'
 import { Route as HostsRouteImport } from './routes/hosts'
 import { Route as GitConfigRouteImport } from './routes/git-config'
@@ -50,6 +51,11 @@ const PortsRoute = PortsRouteImport.update({
   path: '/ports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocalDomainsRoute = LocalDomainsRouteImport.update({
+  id: '/local-domains',
+  path: '/local-domains',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstallationRoute = InstallationRouteImport.update({
   id: '/installation',
   path: '/installation',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/git-config': typeof GitConfigRoute
   '/hosts': typeof HostsRoute
   '/installation': typeof InstallationRoute
+  '/local-domains': typeof LocalDomainsRoute
   '/ports': typeof PortsRoute
   '/projects': typeof ProjectsRoute
   '/recipe': typeof RecipeRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/git-config': typeof GitConfigRoute
   '/hosts': typeof HostsRoute
   '/installation': typeof InstallationRoute
+  '/local-domains': typeof LocalDomainsRoute
   '/ports': typeof PortsRoute
   '/projects': typeof ProjectsRoute
   '/recipe': typeof RecipeRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/git-config': typeof GitConfigRoute
   '/hosts': typeof HostsRoute
   '/installation': typeof InstallationRoute
+  '/local-domains': typeof LocalDomainsRoute
   '/ports': typeof PortsRoute
   '/projects': typeof ProjectsRoute
   '/recipe': typeof RecipeRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/git-config'
     | '/hosts'
     | '/installation'
+    | '/local-domains'
     | '/ports'
     | '/projects'
     | '/recipe'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/git-config'
     | '/hosts'
     | '/installation'
+    | '/local-domains'
     | '/ports'
     | '/projects'
     | '/recipe'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/git-config'
     | '/hosts'
     | '/installation'
+    | '/local-domains'
     | '/ports'
     | '/projects'
     | '/recipe'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   GitConfigRoute: typeof GitConfigRoute
   HostsRoute: typeof HostsRoute
   InstallationRoute: typeof InstallationRoute
+  LocalDomainsRoute: typeof LocalDomainsRoute
   PortsRoute: typeof PortsRoute
   ProjectsRoute: typeof ProjectsRoute
   RecipeRoute: typeof RecipeRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/local-domains': {
+      id: '/local-domains'
+      path: '/local-domains'
+      fullPath: '/local-domains'
+      preLoaderRoute: typeof LocalDomainsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/installation': {
       id: '/installation'
       path: '/installation'
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   GitConfigRoute: GitConfigRoute,
   HostsRoute: HostsRoute,
   InstallationRoute: InstallationRoute,
+  LocalDomainsRoute: LocalDomainsRoute,
   PortsRoute: PortsRoute,
   ProjectsRoute: ProjectsRoute,
   RecipeRoute: RecipeRoute,

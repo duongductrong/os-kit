@@ -56,6 +56,10 @@ function useNavData() {
           url: "/hosts",
         },
         {
+          title: "Local Domains",
+          url: "/local-domains",
+        },
+        {
           title: "Ports",
           url: "/ports",
         },
