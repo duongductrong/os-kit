@@ -4,9 +4,10 @@
     ["@semantic-release/commit-analyzer", {
       "preset": "conventionalcommits",
       "releaseRules": [
-        { "type": "release", "release": "minor" },
-        { "type": "release", "scope": "*", "release": "patch" },
+        { "type": "release", "scope": "major", "release": "major" },
+        { "type": "release", "scope": "minor", "release": "minor" },
         { "breaking": true, "release": "major" },
+        { "type": "release", "release": "patch" },
         { "type": "feat", "release": false },
         { "type": "fix", "release": false },
         { "type": "perf", "release": false },

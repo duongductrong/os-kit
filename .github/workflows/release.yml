@@ -18,6 +18,7 @@ jobs:
     outputs:
       released: ${{ steps.semantic.outputs.new_release_published }}
       version: ${{ steps.semantic.outputs.new_release_version }}
+      notes: ${{ steps.semantic.outputs.new_release_notes }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -102,8 +103,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v${{ needs.release.outputs.version }}
-          releaseName: "OS Kit v${{ needs.release.outputs.version }}"
+          releaseName: "v${{ needs.release.outputs.version }}"
           releaseBody: |
+            ${{ needs.release.outputs.notes }}
+
+            ---
+
             ## Installation
 
             Download the appropriate installer for your platform from the assets below.
@@ -115,9 +120,6 @@ jobs:
             > sudo xattr -rd com.apple.quarantine /Applications/OS\ Kit.app
             > ```
             > Or right-click the app and select "Open" to allow it.
-
-            ### Windows
-            Download and run the `.msi` or `.exe` installer.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

@@ -108,9 +108,6 @@ releaseBody: |
   > sudo xattr -rd com.apple.quarantine /Applications/OS\ Kit.app
   > ```
 
-  ### Windows
-  Download and run the `.msi` or `.exe` installer.
-
   ---
 
   ## What's Changed
