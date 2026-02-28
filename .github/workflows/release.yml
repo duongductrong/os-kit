@@ -5,6 +5,16 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      bump:
+        description: "Release type"
+        required: true
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
@@ -38,6 +48,19 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Create release trigger commit (manual dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          BUMP="${{ inputs.bump }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ "$BUMP" = "patch" ]; then
+            git commit --allow-empty -m "release: manual $BUMP release"
+          else
+            git commit --allow-empty -m "release($BUMP): manual $BUMP release"
+          fi
+          git push
 
       - name: Semantic Release
         id: semantic
