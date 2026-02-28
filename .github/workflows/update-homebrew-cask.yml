@@ -1,0 +1,121 @@
+name: Update Homebrew Cask
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  update-cask:
+    runs-on: ubuntu-latest
+    if: "!github.event.release.prerelease && !github.event.release.draft"
+
+    steps:
+      - name: Get release version
+        id: release
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download macOS DMG artifacts and compute SHA256
+        id: sha
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          REPO="${{ github.repository }}"
+
+          # Download aarch64 DMG with retry
+          ARM_URL="https://github.com/${REPO}/releases/download/v${VERSION}/OS.Kit_${VERSION}_aarch64.dmg"
+          echo "Downloading aarch64 DMG from: $ARM_URL"
+          curl -sL --retry 3 --retry-delay 5 -o arm64.dmg "$ARM_URL"
+
+          if [ ! -s arm64.dmg ]; then
+            echo "Error: aarch64 DMG download failed or empty"
+            exit 1
+          fi
+
+          ARM_SHA=$(sha256sum arm64.dmg | cut -d' ' -f1)
+          echo "arm_sha=$ARM_SHA" >> "$GITHUB_OUTPUT"
+          echo "ARM64 SHA256: $ARM_SHA"
+
+          # Download x64 DMG with retry
+          X64_URL="https://github.com/${REPO}/releases/download/v${VERSION}/OS.Kit_${VERSION}_x64.dmg"
+          echo "Downloading x64 DMG from: $X64_URL"
+          curl -sL --retry 3 --retry-delay 5 -o x64.dmg "$X64_URL"
+
+          if [ ! -s x64.dmg ]; then
+            echo "Error: x64 DMG download failed or empty"
+            exit 1
+          fi
+
+          X64_SHA=$(sha256sum x64.dmg | cut -d' ' -f1)
+          echo "x64_sha=$X64_SHA" >> "$GITHUB_OUTPUT"
+          echo "x64 SHA256: $X64_SHA"
+
+      - name: Checkout Homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: duongductrong/homebrew-oskit
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+
+      - name: Update cask formula
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          ARM_SHA="${{ steps.sha.outputs.arm_sha }}"
+          X64_SHA="${{ steps.sha.outputs.x64_sha }}"
+
+          cd tap
+
+          python3 << 'PYEOF'
+          import re, sys
+
+          version = "${{ steps.release.outputs.version }}"
+          arm_sha = "${{ steps.sha.outputs.arm_sha }}"
+          x64_sha = "${{ steps.sha.outputs.x64_sha }}"
+
+          with open("Casks/os-kit.rb", "r") as f:
+              content = f.read()
+
+          original = content
+
+          # Update version
+          content = re.sub(r'version ".*?"', f'version "{version}"', content)
+
+          # Update ARM64 sha256 (inside on_arm block)
+          content = re.sub(
+              r'(on_arm do\s+url "[^"]+"\s+sha256 ")[^"]+(")',
+              rf'\g<1>{arm_sha}\2',
+              content,
+              flags=re.DOTALL
+          )
+
+          # Update x64 sha256 (inside on_intel block)
+          content = re.sub(
+              r'(on_intel do\s+url "[^"]+"\s+sha256 ")[^"]+(")',
+              rf'\g<1>{x64_sha}\2',
+              content,
+              flags=re.DOTALL
+          )
+
+          if content == original:
+              print("Error: No substitutions made — cask format may not match expected pattern")
+              sys.exit(1)
+
+          with open("Casks/os-kit.rb", "w") as f:
+              f.write(content)
+
+          print(f"Updated cask to v{version}")
+          PYEOF
+
+      - name: Commit and push
+        run: |
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/os-kit.rb
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: update os-kit to v${{ steps.release.outputs.version }}"
+          git push

@@ -1,0 +1,159 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  # Job 1: Run semantic-release to analyze commits, bump version, create tag + GitHub release
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.semantic.outputs.new_release_published }}
+      version: ${{ steps.semantic.outputs.new_release_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/exec
+            @semantic-release/git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job 2: Build Tauri app for all platforms, upload assets to draft release
+  build:
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+            rust_target: aarch64-apple-darwin
+          - platform: macos-13
+            args: --target x86_64-apple-darwin
+            rust_target: x86_64-apple-darwin
+          - platform: windows-latest
+            args: ""
+            rust_target: ""
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository at release tag
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.release.outputs.version }}
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - name: Build and upload Tauri app
+        uses: tauri-apps/tauri-action@v0.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v${{ needs.release.outputs.version }}
+          releaseName: "OS Kit v${{ needs.release.outputs.version }}"
+          releaseBody: |
+            ## Installation
+
+            Download the appropriate installer for your platform from the assets below.
+
+            ### macOS
+            > **Note**: OS Kit is not signed with an Apple Developer certificate.
+            > After installing, open Terminal and run:
+            > ```
+            > sudo xattr -rd com.apple.quarantine /Applications/OS\ Kit.app
+            > ```
+            > Or right-click the app and select "Open" to allow it.
+
+            ### Windows
+            Download and run the `.msi` or `.exe` installer.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+  # Job 3: Publish draft release after ALL builds complete
+  publish:
+    needs: [release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+
+          # Find the draft release by tag and publish it
+          RELEASE_ID=$(gh api "repos/${{ github.repository }}/releases" \
+            --jq ".[] | select(.tag_name == \"v${VERSION}\" and .draft == true) | .id")
+
+          if [ -z "$RELEASE_ID" ]; then
+            echo "No draft release found for v${VERSION}, checking for existing published release..."
+            EXISTING=$(gh api "repos/${{ github.repository }}/releases" \
+              --jq ".[] | select(.tag_name == \"v${VERSION}\" and .draft == false) | .id")
+            if [ -n "$EXISTING" ]; then
+              echo "Release v${VERSION} already published (ID: ${EXISTING})"
+              exit 0
+            fi
+            echo "Error: No release found for tag v${VERSION}"
+            exit 1
+          fi
+
+          gh api "repos/${{ github.repository }}/releases/${RELEASE_ID}" \
+            -X PATCH \
+            -F draft=false
+
+          echo "Published release v${VERSION} (ID: ${RELEASE_ID})"

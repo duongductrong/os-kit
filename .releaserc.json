@@ -1,0 +1,55 @@
+{
+  "branches": ["master"],
+  "plugins": [
+    ["@semantic-release/commit-analyzer", {
+      "preset": "conventionalcommits",
+      "releaseRules": [
+        { "type": "release", "release": "minor" },
+        { "type": "release", "scope": "*", "release": "patch" },
+        { "breaking": true, "release": "major" },
+        { "type": "feat", "release": false },
+        { "type": "fix", "release": false },
+        { "type": "perf", "release": false },
+        { "type": "refactor", "release": false },
+        { "type": "docs", "release": false },
+        { "type": "style", "release": false },
+        { "type": "test", "release": false },
+        { "type": "ci", "release": false },
+        { "type": "chore", "release": false },
+        { "type": "build", "release": false },
+        { "type": "revert", "release": false }
+      ]
+    }],
+    ["@semantic-release/release-notes-generator", {
+      "preset": "conventionalcommits",
+      "presetConfig": {
+        "types": [
+          { "type": "release", "section": "Release", "hidden": false },
+          { "type": "feat", "section": "Features", "hidden": false },
+          { "type": "fix", "section": "Bug Fixes", "hidden": false },
+          { "type": "perf", "section": "Performance", "hidden": false },
+          { "type": "refactor", "section": "Refactors", "hidden": true },
+          { "type": "docs", "section": "Documentation", "hidden": true },
+          { "type": "chore", "section": "Maintenance", "hidden": true },
+          { "type": "ci", "section": "CI", "hidden": true },
+          { "type": "test", "section": "Tests", "hidden": true },
+          { "type": "style", "section": "Styles", "hidden": true },
+          { "type": "build", "section": "Build", "hidden": true }
+        ]
+      }
+    }],
+    ["@semantic-release/changelog", {
+      "changelogFile": "CHANGELOG.md"
+    }],
+    ["@semantic-release/exec", {
+      "prepareCmd": "node scripts/update-version.mjs ${nextRelease.version}"
+    }],
+    ["@semantic-release/npm", {
+      "npmPublish": false
+    }],
+    ["@semantic-release/git", {
+      "assets": ["CHANGELOG.md", "package.json", "src-tauri/tauri.conf.json", "src-tauri/Cargo.toml"],
+      "message": "chore(release): v${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    }]
+  ]
+}
