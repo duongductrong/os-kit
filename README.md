@@ -1,7 +1,7 @@
 # OS Kit
 
-[![Release](https://github.com/duongductrong/oskit/actions/workflows/release.yml/badge.svg)](https://github.com/duongductrong/oskit/actions/workflows/release.yml)
-[![Latest Release](https://img.shields.io/github/v/release/duongductrong/oskit)](https://github.com/duongductrong/oskit/releases/latest)
+[![Release](https://github.com/duongductrong/os-kit/actions/workflows/release.yml/badge.svg)](https://github.com/duongductrong/os-kit/actions/workflows/release.yml)
+[![Latest Release](https://img.shields.io/github/v/release/duongductrong/os-kit)](https://github.com/duongductrong/os-kit/releases/latest)
 
 A desktop toolkit application built with Tauri v2, React, and TypeScript.
 
@@ -16,7 +16,7 @@ brew install --cask os-kit
 
 ### Direct Download
 
-Download the latest installer from the [Releases page](https://github.com/duongductrong/oskit/releases/latest):
+Download the latest installer from the [Releases page](https://github.com/duongductrong/os-kit/releases/latest):
 
 | Platform | Architecture | File |
 |----------|-------------|------|
