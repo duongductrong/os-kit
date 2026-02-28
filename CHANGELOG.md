@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/duongductrong/os-kit/compare/v1.0.0...v1.1.0) (2026-02-28)
+
+### Release
+
+* first release with CI/CD pipeline and Homebrew cask distribution ([d3cbbc4](https://github.com/duongductrong/os-kit/commit/d3cbbc4261cf22a42f6e13610f6bde0c1873cf0c))
+
 ## 1.0.0 (2026-02-28)
 
 ### Release
