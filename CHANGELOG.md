@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/duongductrong/os-kit/compare/v1.2.0...v1.3.0) (2026-02-28)
+
+### Release
+
+* **fix:** fix cicd ([c9e5a00](https://github.com/duongductrong/os-kit/commit/c9e5a00e12447108c74eeb28d3cd7be7beda9f9a))
+
 ## [1.2.0](https://github.com/duongductrong/os-kit/compare/v1.1.0...v1.2.0) (2026-02-28)
 
 ### Release
