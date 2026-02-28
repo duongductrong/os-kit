@@ -29,6 +29,8 @@ export interface InstallTool {
   installCommand?: string;
   /** Shell command to get the current version (stdout is captured) */
   versionCommand?: string;
+  /** Shell command to get the disk size (stdout like "1.2G" or "450M") */
+  sizeCommand?: string;
   /** Whether this tool has an expandable detail panel */
   hasDetails?: boolean;
   /** Homebrew cask name — enables brew-management detection at runtime */

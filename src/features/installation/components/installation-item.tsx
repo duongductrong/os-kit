@@ -85,6 +85,7 @@ interface InstallationItemProps {
   tool: InstallTool;
   status: ToolStatus;
   version: string | null;
+  size: string | null;
   managedBy: ManagedBy;
   actions: ToolAction[];
   logState?: ToolLogState;
@@ -99,6 +100,7 @@ export function InstallationItem({
   tool,
   status,
   version,
+  size,
   managedBy,
   actions,
   logState,
@@ -124,6 +126,11 @@ export function InstallationItem({
               {status === "installed" && version && (
                 <span className="font-mono text-xs font-normal text-muted-foreground">
                   {version}
+                </span>
+              )}
+              {status === "installed" && size && (
+                <span className="font-mono text-[10px] font-normal text-muted-foreground/70">
+                  {size}
                 </span>
               )}
               {status === "installed" &&

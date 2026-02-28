@@ -14,6 +14,7 @@ sections:
         checkCommand: "test -x /opt/homebrew/bin/brew || test -x /usr/local/bin/brew"
         installCommand: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
         versionCommand: "/opt/homebrew/bin/brew --version 2>/dev/null | head -1 || /usr/local/bin/brew --version 2>/dev/null | head -1"
+        sizeCommand: "du -sh /opt/homebrew 2>/dev/null | cut -f1 | xargs || du -sh /usr/local/Homebrew 2>/dev/null | cut -f1 | xargs"
         actions:
           - id: upgrade
             label: Upgrade version
@@ -33,6 +34,7 @@ sections:
         checkCommand: "test -d $HOME/.nvm"
         installCommand: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh)"'
         versionCommand: ". $HOME/.nvm/nvm.sh && nvm current 2>/dev/null"
+        sizeCommand: "du -sh $HOME/.nvm 2>/dev/null | cut -f1 | xargs"
         hasDetails: true
         actions:
           - id: upgrade
@@ -51,6 +53,7 @@ sections:
         checkCommand: "test -x /opt/homebrew/bin/python3 || test -x /usr/bin/python3 || test -x /usr/local/bin/python3"
         installCommand: "/opt/homebrew/bin/brew install python"
         versionCommand: "/opt/homebrew/bin/python3 --version 2>/dev/null || /usr/bin/python3 --version 2>/dev/null || /usr/local/bin/python3 --version 2>/dev/null"
+        sizeCommand: "du -sh /opt/homebrew/opt/python* 2>/dev/null | tail -1 | cut -f1 | xargs"
         actions:
           - id: upgrade
             label: Upgrade version
@@ -85,6 +88,7 @@ sections:
         checkCommand: "test -d $HOME/.rustup"
         installCommand: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
         versionCommand: "$HOME/.cargo/bin/rustc --version 2>/dev/null"
+        sizeCommand: "du -shc $HOME/.rustup $HOME/.cargo 2>/dev/null | tail -1 | cut -f1 | xargs"
         actions:
           - id: upgrade
             label: Upgrade version
@@ -326,6 +330,7 @@ sections:
         icon: "⚙️"
         checkCommand: "test -d $HOME/.oh-my-zsh"
         installCommand: 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
+        sizeCommand: "du -sh $HOME/.oh-my-zsh 2>/dev/null | cut -f1 | xargs"
         actions:
           - id: upgrade
             label: Upgrade version

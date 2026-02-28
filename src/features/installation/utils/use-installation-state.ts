@@ -34,6 +34,7 @@ export function useInstallationState() {
         upgradeCommand: getToolAction(t, "upgrade")?.command,
         uninstallCommand: getToolAction(t, "uninstall")?.command,
         versionCommand: t.versionCommand,
+        sizeCommand: t.sizeCommand,
         brewCaskName: t.brewCaskName,
       }));
   }, [sections]);
@@ -188,6 +189,7 @@ export function useInstallationState() {
     sections,
     statusMap,
     versionMap: detection.versionMap,
+    sizeMap: detection.sizeMap,
     managedByMap,
     actionsMap: effectiveActionsMap,
     logsMap,

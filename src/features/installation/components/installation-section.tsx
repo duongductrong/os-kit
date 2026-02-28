@@ -19,6 +19,7 @@ interface InstallationSectionProps {
   section: InstallSection;
   statusMap: Record<string, ToolStatus>;
   versionMap: Record<string, string | null>;
+  sizeMap: Record<string, string | null>;
   managedByMap: Record<string, ManagedBy>;
   actionsMap: Record<string, ToolAction[]>;
   logsMap: Record<string, ToolLogState>;
@@ -35,6 +36,7 @@ export function InstallationSection({
   section,
   statusMap,
   versionMap,
+  sizeMap,
   managedByMap,
   actionsMap,
   logsMap,
@@ -87,6 +89,7 @@ export function InstallationSection({
                 tool={tool}
                 status={statusMap[tool.id] ?? "idle"}
                 version={versionMap[tool.id] ?? null}
+                size={sizeMap[tool.id] ?? null}
                 managedBy={managedByMap[tool.id] ?? "manual"}
                 actions={actions}
                 logState={logsMap[tool.id]}

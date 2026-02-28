@@ -14,6 +14,7 @@ export default function Installation() {
     sections,
     statusMap,
     versionMap,
+    sizeMap,
     managedByMap,
     actionsMap,
     logsMap,
@@ -66,6 +67,7 @@ export default function Installation() {
               section={section}
               statusMap={statusMap}
               versionMap={versionMap}
+              sizeMap={sizeMap}
               managedByMap={managedByMap}
               actionsMap={actionsMap}
               logsMap={logsMap}

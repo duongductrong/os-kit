@@ -16,6 +16,8 @@ export interface ToolDetectionConfig {
   uninstallCommand?: string;
   /** Shell command to get the version string (stdout is captured and trimmed) */
   versionCommand?: string;
+  /** Shell command to get the disk size string (e.g. "1.2G", "450M") */
+  sizeCommand?: string;
   /** Homebrew cask name — if set, detection will check if brew manages this app */
   brewCaskName?: string;
 }
@@ -33,6 +35,7 @@ export interface ToolDetectionResult {
   status: ToolStatus;
   checking: boolean;
   version: string | null;
+  size: string | null;
   managedBy: ManagedBy;
   install: (stream?: StreamCallbacks) => Promise<void>;
   upgrade: (stream?: StreamCallbacks) => Promise<void>;
@@ -112,6 +115,7 @@ export function useToolDetection(
   const [status, setStatus] = useState<ToolStatus>("idle");
   const [checking, setChecking] = useState(true);
   const [version, setVersion] = useState<string | null>(null);
+  const [size, setSize] = useState<string | null>(null);
   const [managedBy, setManagedBy] = useState<ManagedBy>("manual");
 
   const check = useCallback(async () => {
@@ -122,6 +126,10 @@ export function useToolDetection(
         setStatus("installed");
         if (config.versionCommand) {
           setVersion(await fetchVersion(config.versionCommand));
+        }
+        // Fetch disk size (non-blocking, best-effort)
+        if (config.sizeCommand) {
+          fetchVersion(config.sizeCommand).then(setSize);
         }
         // Detect brew management for cask apps
         if (config.brewCaskName) {
@@ -135,12 +143,14 @@ export function useToolDetection(
       } else {
         setStatus("idle");
         setVersion(null);
+        setSize(null);
         setManagedBy("manual");
       }
     } catch (error) {
       console.log(`useToolDetection(${config.id}):`, error);
       setStatus("idle");
       setVersion(null);
+      setSize(null);
       setManagedBy("manual");
     } finally {
       setChecking(false);
@@ -149,6 +159,7 @@ export function useToolDetection(
     config.checkCommand,
     config.id,
     config.versionCommand,
+    config.sizeCommand,
     config.brewCaskName,
   ]);
 
@@ -234,6 +245,7 @@ export function useToolDetection(
     status,
     checking,
     version,
+    size,
     managedBy,
     install,
     upgrade,
@@ -265,6 +277,7 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
     (stream?: StreamCallbacks) => Promise<void>
   > = {};
   const versionMap: Record<string, string | null> = {};
+  const sizeMap: Record<string, string | null> = {};
   const managedByMap: Record<string, ManagedBy> = {};
   const capabilityMap: Record<
     string,
@@ -278,6 +291,7 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
     upgradeMap[r.id] = r.upgrade;
     uninstallMap[r.id] = r.uninstall;
     versionMap[r.id] = r.version;
+    sizeMap[r.id] = r.size;
     managedByMap[r.id] = r.managedBy;
     capabilityMap[r.id] = {
       hasUpgrade: r.hasUpgrade,
@@ -294,6 +308,7 @@ export function useMultiToolDetection(configs: ToolDetectionConfig[]) {
     upgradeMap,
     uninstallMap,
     versionMap,
+    sizeMap,
     managedByMap,
     capabilityMap,
     isAnyChecking,
