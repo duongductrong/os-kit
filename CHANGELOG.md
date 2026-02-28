@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/duongductrong/os-kit/compare/v1.1.0...v1.2.0) (2026-02-28)
+
+### Release
+
+* fix build ([b4d6349](https://github.com/duongductrong/os-kit/commit/b4d634919d706c5e36a68a7b21ac79d4cc4fb2b1))
+
 ## [1.1.0](https://github.com/duongductrong/os-kit/compare/v1.0.0...v1.1.0) (2026-02-28)
 
 ### Release
