@@ -5,8 +5,6 @@ import {
   SectionContent,
   SectionHeader,
   SectionItem,
-  SectionItemControl,
-  SectionItemLabel,
   SectionTitle,
 } from "@/components/ui/section";
 import type { ZshrcPathEntry } from "@/features/shell/utils/parse-zshrc";
@@ -65,31 +63,27 @@ export function PathEntriesSection({
         <SectionContent>
           {items.map((item, index) => (
             <SectionItem key={item.id} className="gap-2">
-              <SectionItemLabel className="flex-row items-center gap-2">
-                <span className="text-muted-foreground/50 text-xs font-mono w-5 text-right shrink-0">
-                  {index + 1}
-                </span>
-                <Input
-                  value={item.path}
-                  onChange={(e) => updateItem(item.id, e.target.value)}
-                  placeholder="/usr/local/bin"
-                  className="font-mono text-xs h-7"
+              <span className="text-muted-foreground/50 text-xs font-mono w-5 text-right shrink-0">
+                {index + 1}
+              </span>
+              <Input
+                value={item.path}
+                onChange={(e) => updateItem(item.id, e.target.value)}
+                placeholder="/usr/local/bin"
+                className="font-mono text-xs h-7 flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => removeItem(item.id)}
+                className="text-muted-foreground hover:text-destructive shrink-0"
+              >
+                <HugeiconsIcon
+                  icon={Delete02Icon}
+                  strokeWidth={2}
+                  className="size-3.5"
                 />
-              </SectionItemLabel>
-              <SectionItemControl>
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  onClick={() => removeItem(item.id)}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <HugeiconsIcon
-                    icon={Delete02Icon}
-                    strokeWidth={2}
-                    className="size-3.5"
-                  />
-                </Button>
-              </SectionItemControl>
+              </Button>
             </SectionItem>
           ))}
         </SectionContent>

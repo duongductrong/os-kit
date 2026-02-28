@@ -8,8 +8,12 @@ export interface UseZshrcEditorReturn {
   isSaving: boolean;
   error: string | null;
   isDirty: boolean;
+  hasBackup: boolean;
+  backupTimestamp: string | null;
   load: () => Promise<void>;
   save: () => Promise<void>;
+  backup: () => Promise<void>;
+  restoreBackup: () => Promise<void>;
   setContent: (content: string) => void;
 }
 
@@ -27,22 +31,42 @@ export function useZshrcEditor(): UseZshrcEditorReturn {
   const [originalContent, setOriginalContent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasBackup, setHasBackup] = useState(false);
+  const [backupTimestamp, setBackupTimestamp] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mountedRef = useRef(true);
 
   const isDirty = content !== originalContent;
 
+  const checkBackup = useCallback(async () => {
+    try {
+      // Get modification time of backup file
+      const timestamp = await runShellCommand(
+        "stat -f '%Sm' -t '%Y-%m-%d %H:%M:%S' ~/.zshrc.backup 2>/dev/null"
+      );
+      if (mountedRef.current) {
+        setHasBackup(true);
+        setBackupTimestamp(timestamp.trim());
+      }
+    } catch {
+      if (mountedRef.current) {
+        setHasBackup(false);
+        setBackupTimestamp(null);
+      }
+    }
+  }, []);
+
   const load = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Ensure the file exists; create it if it doesn't
       await runShellCommand("touch ~/.zshrc");
       const result = await runShellCommand("cat ~/.zshrc");
       if (mountedRef.current) {
         setContent(result);
         setOriginalContent(result);
       }
+      await checkBackup();
     } catch (err) {
       if (mountedRef.current) {
         setError(
@@ -54,17 +78,14 @@ export function useZshrcEditor(): UseZshrcEditorReturn {
         setIsLoading(false);
       }
     }
-  }, []);
+  }, [checkBackup]);
 
   const save = useCallback(async () => {
     setIsSaving(true);
     setError(null);
     try {
-      // Create a backup first
       await runShellCommand("cp ~/.zshrc ~/.zshrc.backup 2>/dev/null || true");
 
-      // Base64-encode in JS to avoid all shell escaping issues,
-      // then decode on the shell side and write to file
       const encoder = new TextEncoder();
       const bytes = encoder.encode(content);
       const base64 = btoa(String.fromCharCode(...bytes));
@@ -73,7 +94,9 @@ export function useZshrcEditor(): UseZshrcEditorReturn {
 
       if (mountedRef.current) {
         setOriginalContent(content);
+        setHasBackup(true);
       }
+      await checkBackup();
     } catch (err) {
       if (mountedRef.current) {
         setError(
@@ -85,7 +108,44 @@ export function useZshrcEditor(): UseZshrcEditorReturn {
         setIsSaving(false);
       }
     }
-  }, [content]);
+  }, [content, checkBackup]);
+
+  const backup = useCallback(async () => {
+    setError(null);
+    try {
+      await runShellCommand("cp ~/.zshrc ~/.zshrc.backup");
+      await checkBackup();
+    } catch (err) {
+      if (mountedRef.current) {
+        setError(
+          err instanceof Error ? err.message : "Failed to create backup",
+        );
+      }
+    }
+  }, [checkBackup]);
+
+  const restoreBackup = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await runShellCommand("cp ~/.zshrc.backup ~/.zshrc");
+      const result = await runShellCommand("cat ~/.zshrc");
+      if (mountedRef.current) {
+        setContent(result);
+        setOriginalContent(result);
+      }
+    } catch (err) {
+      if (mountedRef.current) {
+        setError(
+          err instanceof Error ? err.message : "Failed to restore backup",
+        );
+      }
+    } finally {
+      if (mountedRef.current) {
+        setIsLoading(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -102,8 +162,12 @@ export function useZshrcEditor(): UseZshrcEditorReturn {
     isSaving,
     error,
     isDirty,
+    hasBackup,
+    backupTimestamp,
     load,
     save,
+    backup,
+    restoreBackup,
     setContent,
   };
 }

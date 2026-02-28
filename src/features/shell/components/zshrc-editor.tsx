@@ -1,33 +1,46 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useZshrcEditor } from "@/features/shell/hooks/use-zshrc-editor";
-import { ZshrcVisualEditor } from "@/features/shell/components/visual-editor/zshrc-visual-editor";
 import {
   Alert02Icon,
-  CodeIcon,
-  DashboardSquare01Icon,
   FileEditIcon,
   FloppyDiskIcon,
   Loading03Icon,
   ReloadIcon,
   Tick02Icon,
+  FileSecurityIcon,
+  RotateLeft01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-type EditorMode = "visual" | "raw";
-
 export function ZshrcEditor() {
-  const [mode, setMode] = useState<EditorMode>("visual");
+  const [backupMessage, setBackupMessage] = useState<string | null>(null);
   const {
     content,
     isLoading,
     isSaving,
     error,
     isDirty,
+    hasBackup,
+    backupTimestamp,
     load,
     save,
+    backup,
+    restoreBackup,
     setContent,
   } = useZshrcEditor();
+
+  const handleBackup = async () => {
+    await backup();
+    setBackupMessage("Backup created successfully");
+    setTimeout(() => setBackupMessage(null), 3000);
+  };
+
+  const handleRestore = async () => {
+    await restoreBackup();
+    setBackupMessage("Restored from backup");
+    setTimeout(() => setBackupMessage(null), 3000);
+  };
 
   if (isLoading) {
     return (
@@ -71,6 +84,20 @@ export function ZshrcEditor() {
         </div>
       )}
 
+      {/* Backup feedback message */}
+      {backupMessage && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-4 py-2.5">
+          <HugeiconsIcon
+            icon={Tick02Icon}
+            strokeWidth={2}
+            className="size-4 shrink-0 text-emerald-500"
+          />
+          <p className="text-xs text-emerald-600 dark:text-emerald-400">
+            {backupMessage}
+          </p>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -90,39 +117,34 @@ export function ZshrcEditor() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mode Toggle */}
-          <div className="flex items-center rounded-lg border p-0.5">
-            <button
-              onClick={() => setMode("visual")}
-              className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-                mode === "visual"
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleBackup}
+            disabled={isSaving}
+          >
+            <HugeiconsIcon
+              icon={FileSecurityIcon}
+              strokeWidth={2}
+              className="size-3.5"
+            />
+            Backup
+          </Button>
+          {hasBackup && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRestore}
+              disabled={isSaving}
             >
               <HugeiconsIcon
-                icon={DashboardSquare01Icon}
+                icon={RotateLeft01Icon}
                 strokeWidth={2}
-                className="size-3"
+                className="size-3.5"
               />
-              Visual
-            </button>
-            <button
-              onClick={() => setMode("raw")}
-              className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-                mode === "raw"
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <HugeiconsIcon
-                icon={CodeIcon}
-                strokeWidth={2}
-                className="size-3"
-              />
-              Raw
-            </button>
-          </div>
+              Restore
+            </Button>
+          )}
 
           <Button
             variant="outline"
@@ -156,47 +178,55 @@ export function ZshrcEditor() {
         </div>
       </div>
 
-      {/* Editor Content */}
-      {mode === "visual" ? (
-        <ZshrcVisualEditor content={content} onChange={setContent} />
-      ) : (
-        <div className="relative rounded-lg border overflow-hidden">
-          <div className="flex max-h-[60vh]">
-            {/* Line Numbers */}
-            <div
-              className="select-none border-r bg-muted/30 px-3 py-3 text-right font-mono text-xs text-muted-foreground/50 leading-[1.625rem]"
-              aria-hidden="true"
-            >
-              {content.split("\n").map((_, i) => (
-                <div key={i}>{i + 1}</div>
-              ))}
-            </div>
-
-            {/* Textarea */}
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              spellCheck={false}
-              className="flex-1 resize-none bg-transparent px-4 py-3 font-mono text-sm leading-[1.625rem] outline-none placeholder:text-muted-foreground/40 min-h-[400px] w-full"
-              placeholder="# Your zshrc configuration..."
-            />
+      {/* Raw Editor */}
+      <div className="relative rounded-lg border overflow-hidden">
+        <div className="flex max-h-[60vh]">
+          {/* Line Numbers */}
+          <div
+            className="select-none border-r bg-muted/30 px-3 py-3 text-right font-mono text-xs text-muted-foreground/50 leading-[1.625rem]"
+            aria-hidden="true"
+          >
+            {content.split("\n").map((_, i) => (
+              <div key={i}>{i + 1}</div>
+            ))}
           </div>
+
+          {/* Textarea */}
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            spellCheck={false}
+            className="flex-1 resize-none bg-transparent px-4 py-3 font-mono text-sm leading-[1.625rem] outline-none placeholder:text-muted-foreground/40 min-h-[400px] w-full"
+            placeholder="# Your zshrc configuration..."
+          />
         </div>
-      )}
+      </div>
 
       {/* Status Bar */}
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>{content.split("\n").length} lines</span>
-        {!isDirty && !isSaving && (
-          <span className="flex items-center gap-1">
-            <HugeiconsIcon
-              icon={Tick02Icon}
-              strokeWidth={2}
-              className="size-3 text-emerald-500"
-            />
-            Up to date
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {hasBackup && backupTimestamp && (
+            <span className="flex items-center gap-1">
+              <HugeiconsIcon
+                icon={FileSecurityIcon}
+                strokeWidth={2}
+                className="size-3"
+              />
+              Backup: {backupTimestamp}
+            </span>
+          )}
+          {!isDirty && !isSaving && (
+            <span className="flex items-center gap-1">
+              <HugeiconsIcon
+                icon={Tick02Icon}
+                strokeWidth={2}
+                className="size-3 text-emerald-500"
+              />
+              Up to date
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

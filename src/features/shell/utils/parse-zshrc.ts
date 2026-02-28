@@ -49,8 +49,7 @@ function nextId(): string {
 // export VAR=value  or  export VAR="value"  or  export VAR='value'
 const RE_EXPORT = /^export\s+([A-Za-z_][A-Za-z0-9_]*)=(.*)$/;
 // PATH-specific: export PATH="...:$PATH"  or  export PATH=...:$PATH
-const RE_PATH_EXPORT =
-  /^export\s+PATH=["']?(.+?)(?::?\$PATH)?["']?\s*$/;
+const RE_PATH_EXPORT = /^export\s+PATH=(.+)$/;
 // alias name='command' or alias name="command" or alias name=command
 const RE_ALIAS = /^alias\s+([A-Za-z_][A-Za-z0-9_-]*)=(.*)$/;
 // source ... or . ...
@@ -90,19 +89,27 @@ export function parseZshrc(content: string): ZshrcParsed {
     // Check PATH export first (before generic export)
     const pathMatch = trimmed.match(RE_PATH_EXPORT);
     if (pathMatch && trimmed.includes("PATH")) {
-      // Extract individual paths from the value
-      const pathValue = pathMatch[1];
-      const paths = pathValue
+      // Strip outer quotes from the whole value first, then split
+      let rawValue = pathMatch[1].trim();
+      // Remove wrapping quotes (handles "..." and '...')
+      if (
+        (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+        (rawValue.startsWith("'") && rawValue.endsWith("'"))
+      ) {
+        rawValue = rawValue.slice(1, -1);
+      }
+      // Filter out $PATH/${PATH} self-references — they're not real directories
+      const paths = rawValue
         .split(":")
-        .filter((p) => p && p !== "$PATH" && p.trim() !== "");
+        .map((p) => p.trim())
+        .filter((p) => p !== "" && p !== "$PATH" && p !== "${PATH}");
       for (const p of paths) {
         result.pathEntries.push({
           id: nextId(),
-          path: unquote(p),
+          path: p,
           raw: line,
         });
       }
-      // If no paths extracted, keep original
       if (paths.length === 0) {
         result.otherLines.push(line);
       }
@@ -180,6 +187,7 @@ export function buildZshrc(parsed: ZshrcParsed): string {
 
   // PATH entries — combine into single export
   if (parsed.pathEntries.length > 0) {
+    // Append :$PATH to preserve existing system PATH entries
     const pathValue = parsed.pathEntries.map((p) => p.path).join(":");
     sections.push(`export PATH="${pathValue}:$PATH"`);
   }
