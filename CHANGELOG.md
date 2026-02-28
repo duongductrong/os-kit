@@ -1,3 +1,13 @@
+## [1.3.1](https://github.com/duongductrong/os-kit/compare/v1.3.0...v1.3.1) (2026-02-28)
+
+### Release
+
+* manual patch release ([77971a9](https://github.com/duongductrong/os-kit/commit/77971a9675fc1b8f707676e071b6e95da348f5b4))
+
+### Features
+
+* **release:** add manual dispatch options for release type and trigger commit ([ee333b5](https://github.com/duongductrong/os-kit/commit/ee333b5cfafed2323a679f8bdc114f9af442ff63))
+
 ## [1.3.0](https://github.com/duongductrong/os-kit/compare/v1.2.0...v1.3.0) (2026-02-28)
 
 ### Release
