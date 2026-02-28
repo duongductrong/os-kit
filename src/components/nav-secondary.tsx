@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Link } from "@tanstack/react-router";
 
 export function NavSecondary({
   items,
@@ -44,7 +45,16 @@ export function NavSecondary({
           <SidebarMenuItem key={item.title}>
             <Tooltip>
               <TooltipTrigger>
-                <SidebarMenuButton size="sm" render={<a href={item.url} />}>
+                <SidebarMenuButton
+                  size="sm"
+                  render={
+                    item.url.startsWith("/") ? (
+                      <Link to={item.url} />
+                    ) : (
+                      <a href={item.url} />
+                    )
+                  }
+                >
                   {item.icon}
                 </SidebarMenuButton>
               </TooltipTrigger>

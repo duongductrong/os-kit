@@ -152,7 +152,7 @@ function useNavData() {
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: (
         <HugeiconsIcon
           icon={Setting07Icon}
@@ -186,21 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data = useNavData();
   return (
     <Sidebar variant="inset" {...props}>
-      <SidebarHeader className="h-8">
-        {/* <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<a href="#" />}>
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <HugeiconsIcon icon={CommandIcon} strokeWidth={2} className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Acme Inc</span>
-                <span className="truncate text-xs">Enterprise</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu> */}
-      </SidebarHeader>
+      <SidebarHeader className="h-8" />
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />

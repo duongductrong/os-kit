@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SystemInfoRouteImport } from './routes/system-info'
 import { Route as SshRouteImport } from './routes/ssh'
 import { Route as ShellRouteImport } from './routes/shell'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipeRouteImport } from './routes/recipe'
 import { Route as PortsRouteImport } from './routes/ports'
 import { Route as LocalDomainsRouteImport } from './routes/local-domains'
@@ -33,6 +34,11 @@ const SshRoute = SshRouteImport.update({
 const ShellRoute = ShellRouteImport.update({
   id: '/shell',
   path: '/shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecipeRoute = RecipeRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/local-domains': typeof LocalDomainsRoute
   '/ports': typeof PortsRoute
   '/recipe': typeof RecipeRoute
+  '/settings': typeof SettingsRoute
   '/shell': typeof ShellRoute
   '/ssh': typeof SshRoute
   '/system-info': typeof SystemInfoRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/local-domains': typeof LocalDomainsRoute
   '/ports': typeof PortsRoute
   '/recipe': typeof RecipeRoute
+  '/settings': typeof SettingsRoute
   '/shell': typeof ShellRoute
   '/ssh': typeof SshRoute
   '/system-info': typeof SystemInfoRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/local-domains': typeof LocalDomainsRoute
   '/ports': typeof PortsRoute
   '/recipe': typeof RecipeRoute
+  '/settings': typeof SettingsRoute
   '/shell': typeof ShellRoute
   '/ssh': typeof SshRoute
   '/system-info': typeof SystemInfoRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/local-domains'
     | '/ports'
     | '/recipe'
+    | '/settings'
     | '/shell'
     | '/ssh'
     | '/system-info'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/local-domains'
     | '/ports'
     | '/recipe'
+    | '/settings'
     | '/shell'
     | '/ssh'
     | '/system-info'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/local-domains'
     | '/ports'
     | '/recipe'
+    | '/settings'
     | '/shell'
     | '/ssh'
     | '/system-info'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   LocalDomainsRoute: typeof LocalDomainsRoute
   PortsRoute: typeof PortsRoute
   RecipeRoute: typeof RecipeRoute
+  SettingsRoute: typeof SettingsRoute
   ShellRoute: typeof ShellRoute
   SshRoute: typeof SshRoute
   SystemInfoRoute: typeof SystemInfoRoute
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/shell'
       fullPath: '/shell'
       preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recipe': {
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocalDomainsRoute: LocalDomainsRoute,
   PortsRoute: PortsRoute,
   RecipeRoute: RecipeRoute,
+  SettingsRoute: SettingsRoute,
   ShellRoute: ShellRoute,
   SshRoute: SshRoute,
   SystemInfoRoute: SystemInfoRoute,
